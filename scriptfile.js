@@ -71,7 +71,6 @@
         .setPopup(popup)
         .addTo(map);
 
-
       // Configure a new popup
       const popup1 = new maplibregl.Popup({ offset: 35 }).setHTML(
         `<h3>Kennedy Elementary School</h3>
@@ -84,16 +83,6 @@
         .setLngLat([-89.29810542269284, 	43.09598171954781])
         .setPopup(popup1)
         .addTo(map);
-
-
-
-
-
-
-
-
-
-
 
       // Add a click event to each card for switching map styles
       document.querySelector(".map-style.esri-navigation")
