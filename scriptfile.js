@@ -47,7 +47,7 @@
       const map = new maplibregl.Map({
         container: "map",
         center: [-89.4012, 43.0731], // initial center point
-        zoom: 16, // initial zoom level
+        zoom: 11.5, // initial zoom level
         style: "esri-navigation",
         hash: true,
         transformRequest,
@@ -57,32 +57,85 @@
       map.addControl(new maplibregl.NavigationControl(), "bottom-right");
 
 
-
-      // Configure a new popup
-      const popup = new maplibregl.Popup({ offset: 35 }).setHTML(
-        `<h3>ThermaStor</h3>
-        <p>4201 Lien Road, Madison, WI 53704</p>
-        <img src="img/Thermastor.jpg" width="200" />
-        `
-      );
-      // Add a new marker and popup
-      const marker = new maplibregl.Marker()
-        .setLngLat([-89.31111, 	43.11958])
-        .setPopup(popup)
-        .addTo(map);
-
-      // Configure a new popup
-      const popup1 = new maplibregl.Popup({ offset: 35 }).setHTML(
-        `<h3>Kennedy Elementary School</h3>
-        <p>221 Meadowlark Dr, Madison, WI 53714</p>
-        <img src="img/Kennedy.jpg" width="200" />
-        `
-      );
-      // Add a new marker and popup
+      // Add a new marker
       const marker1 = new maplibregl.Marker()
         .setLngLat([-89.29810542269284, 	43.09598171954781])
-        .setPopup(popup1)
         .addTo(map);
+
+        // Add event listener to the marker for mouseover
+        marker1.getElement().addEventListener('mouseover', function() {
+          // Create a popup with the text you want to display
+          var popup = new maplibregl.Popup({ offset: 25 })
+            .setLngLat(marker1.getLngLat())
+            .setHTML('<h3>School One</h3>')
+            .addTo(map);
+          });
+  
+          // Add event listener to remove the popup when mouse leaves the marker
+          marker1.getElement().addEventListener('mouseout', function() {
+          // Remove the popup
+          popup.remove();
+          });
+  
+          // Add event listener to the marker for click
+          marker1.getElement().addEventListener('click', function() {
+          // Open another webpage in the same folder
+          window.location.href = 'School1.html'; 
+          });      
+       
+        const marker2 = new maplibregl.Marker()
+        .setLngLat([-89.31810542269284, 	43.09598171954781]) 
+        .addTo(map);
+
+        // Add event listener to the marker for mouseover
+        marker2.getElement().addEventListener('mouseover', function() {
+        // Create a popup with the text you want to display
+        var popup = new maplibregl.Popup({ offset: 25 })
+          .setLngLat(marker2.getLngLat())
+          .setHTML('<h3>School Two</h3>')
+          .addTo(map);
+        });
+
+        // Add event listener to remove the popup when mouse leaves the marker
+        marker2.getElement().addEventListener('mouseout', function() {
+        // Remove the popup
+        popup.remove();
+        });
+
+        // Add event listener to the marker for click
+        marker2.getElement().addEventListener('click', function() {
+        // Open another webpage in the same folder
+        window.location.href = 'School2.html'; 
+        });
+
+      // Add a new marker 
+      const marker3 = new maplibregl.Marker()
+        .setLngLat([-89.3122, 	43.1202])
+        .addTo(map);
+
+        // Add event listener to the marker for mouseover
+        marker3.getElement().addEventListener('mouseover', function() {
+          // Create a popup with the text you want to display
+          var popup = new maplibregl.Popup({ offset: 25 })
+            .setLngLat(marker3.getLngLat())
+            .setHTML('<h3>School Three</h3>')
+            .addTo(map);
+          });
+  
+          // Add event listener to remove the popup when mouse leaves the marker
+          marker3.getElement().addEventListener('mouseout', function() {
+          // Remove the popup
+          popup.remove();
+          });
+  
+          // Add event listener to the marker for click
+          marker3.getElement().addEventListener('click', function() {
+          // Open another webpage in the same folder
+          window.location.href = 'School3.html'; 
+          });
+
+
+
 
       // Add a click event to each card for switching map styles
       document.querySelector(".map-style.esri-navigation")
