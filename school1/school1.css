@@ -3,7 +3,7 @@
     .popup {
         display: none; 
         position: fixed;
-        top: 40%; 
+        top: 25%; 
         left: 65%; 
         transform: translate(-50%, -50%);
         width: 600px;
