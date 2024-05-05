@@ -1,0 +1,155 @@
+
+    /* Define styles for the popup */
+    .popup {
+        display: none; 
+        position: fixed;
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 500px;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* CSS rule targeting all button elements */
+    button {
+        width: 65px; 
+        height: 40px; 
+        border: none;
+        background-color: white;
+        cursor: pointer;
+        font: 16;
+    }
+
+       .popup-buttons {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+        font-size: 16px 
+    }  
+    .popuptext {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+
+    }
+
+    .closebutton {
+        margin-left: 370px;
+        margin-bottom: 5px;
+        background-color: rgba(211, 192, 192, 0.89)
+
+
+    }
+
+    .goBackButton {
+        border: 2px solid white; 
+        padding: 0px 0px; 
+        background-color: white; 
+        color: blue; 
+        font-size: 20px;
+        cursor: pointer; 
+        width: 150px;
+    }
+
+    .popup-buttons button {
+        width: 100px; 
+        height:75px; 
+        border: 2px solid;
+        justify-content: center;
+        border-color: rgb(0, 4, 255);
+        font-size: 14px;
+        margin-left: 10px;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        background-color: white;
+    }
+    canvas {
+        width: 100%;
+            border: 1px solid black;
+    }
+
+/* Define CSS rules for positioning the button */
+.Room-one {
+    position: absolute;
+    padding: 0px 0px;
+    top: 112px; 
+    left: 122px; 
+    transform: translateX(-50%);
+    font-size: larger;
+    color: red;
+
+}
+
+    /* Define CSS rules for positioning the button */
+    .Room-two {
+        position: absolute;
+        top: 305px; 
+        left: 597px; 
+        transform: translateX(-50%);
+        font-size: larger;
+        color: red;
+    }
+
+    /* Define CSS rules for positioning the button */
+    .Room-three {
+        position: absolute;
+        top: 451px; 
+        left: 113px;
+        transform: translateX(-50%); 
+        font-size: large;
+        color: red;
+    }
+
+    /* Define CSS rules for positioning the button */
+    .Room-four {
+        position: absolute;
+        top: 648px; 
+        left: 695px;
+        transform: translateX(-50%); 
+        font-size: large;
+        color: red;
+    }
+
+    /* Define CSS rules for positioning the button */
+    .Room-five {
+        position: absolute;
+        top: 805px; 
+        left: 578px; 
+        transform: translateX(-50%); 
+        font-size: large;
+        color: red;
+    }
+
+    /* Define CSS rules for positioning the button */
+    .Room-six {
+        position: absolute;
+        top: 805px; 
+        left: 690px; 
+        transform: translateX(-50%);
+        font-size: large;
+        color: red;
+    }
+
+    /* Style the anchor tag to look like a button */
+    .return-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    /* Style for hover effect */
+    .return-button:hover {
+        background-color: #0056b3;
+    }
