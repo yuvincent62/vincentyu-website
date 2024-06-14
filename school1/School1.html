@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Example</title>
+
+    <link rel="stylesheet" href="school1.css">
+
+
+</head>
+<body>
+
+    <div id="canvasContainer">
+        <canvas id="canvas" width="1200" height="1150"></canvas>
+        <button class="Room-one" id="roomone" onclick="openPopup('room1')">Room 1</button>
+        <button class="Room-two" id="roomtwo" onclick="openPopup('room2')">Room 2</button>
+        <button class="Room-three" id="room3"  onclick="openPopup('room3')">Room 3</button>
+        <button class="Room-four" id="roomthree" onclick="openPopup('room4')">Room 4</button>
+        <button class="Room-five" id="roomfive" onclick="openPopup('room5')">Room 5</button>
+        <button class="Room-six" id="roomsix" onclick="openPopup('room6')">Room 6</button>
+    </div>
+
+
+    <div id="popup" class="popup">
+        <div class="popuptext">
+            <p>Title</p>
+        </div>
+        <div class="popuptext">
+            <p>Time:</p>
+        </div>
+        <div class="popup-buttons">
+            <button  id="CO2" onclick="generateRandomData()">CO2</button>
+            <button id="DewPoint" onclick="generateRandomData()">Dew Point</button>
+            <button id="RH" onclick="generateRandomData()">RH</button>
+            <button id="PM" onclick="generateRandomData()">PM2.5</button>
+            <button id="TMP" onclick="generateRandomData()">TMP</button>
+            <button id="TVOC" onclick="generateRandomData()">TVOC</button>
+        </div>
+        
+        <select id="popupDropdownTime">
+          <option value="Avg">Avg</option>
+          <option value="Min">Min</option>
+          <option value="Max">Max</option>
+        </select>
+
+        <select id="popupDropdownDate">
+            <option value="Hour">Hour</option>
+            <option value="Day">Day</option>
+            <option value="Week">Week</option>
+            <option value="Month">Month</option>
+            <option value="ThreeMonth">3 Months</option>
+          </select>
+
+        <button class="closebutton" onclick="closePopup()">Close</button>
+        <canvas id="chartCanvas"></canvas>
+    </div>
+
+
+    <!-- Popup -->
+    <div id="popup" class="popup"></div>
+
+<button class="goBackButton" onclick="goToMap()">Back to Map</button>
+
+<script src="school1.js"></script>
+</body>
+</html>
+
+

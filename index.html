@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>School Project</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://cdn.maptiler.com/maplibre-gl-js/v2.4.0/maplibre-gl.js"></script>
+    <link href="https://cdn.maptiler.com/maplibre-gl-js/v2.4.0/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="stylefile.css">
+
+</head>
+<body>
+    <div id="map"></div>
+
+   <script>
+    const map = new maplibregl.Map({
+            container: 'map',
+            style: `https://api.maptiler.com/maps/streets-v2/style.json?key=mYUHicVKQ6OkT3ldd3Mz`,
+            center: [-89.4012, 43.0731],
+            zoom: 6
+        })
+
+        let markerArray = [];
+        let markerOnScreen = [];
+
+        function createMarker(lngLat, name, url) {
+            // Create the marker
+            var marker = new maplibregl.Marker()
+                .setLngLat(lngLat)
+                .addTo(map);
+
+            // Add marker name to markerArray
+            markerArray.push({name: name, marker: marker});
+
+            // Create popup
+            var popup = new maplibregl.Popup({
+                closeButton: false,
+                closeOnClick: false
+            });
+
+            marker.getElement().addEventListener('mouseenter', function() {
+                popup.setLngLat(marker.getLngLat())
+                    .setHTML('<h3>' + name + '</h3>')
+                    .addTo(map);
+            });
+
+            marker.getElement().addEventListener('mouseleave', function() {
+                popup.remove();
+            });
+
+            marker.getElement().addEventListener('click', function() {
+                // Open another webpage
+                window.location.href = url;
+            });
+
+            return marker;
+        }
+
+        // Add markers
+        var marker1 = createMarker([-89.4012, 43.0731], 'School 1', 'school1/School1.html');
+        var marker2 = createMarker([-89.31810542269284, 43.09598171954781], 'School 2', 'school2/School2.html');
+        var marker3 = createMarker([-89.3122, 43.1202], 'School 3', 'school3/School3.html');
+        var marker4 = createMarker([-87.751678, 41.877331], 'Chicago Jesuit Academy', 'chicagoJesuitAcademy/chicagoJesuitAcademy.html');
+
+        map.on('error', function(err) {
+            throw new Error("To load the map, you must replace YOUR_MAPTILER_API_KEY_HERE first, see README");
+        });
+
+        // Event listener for map move event
+        map.on('move', function() {
+            // Clear the markerOnScreen array
+            markerOnScreen = [];
+
+            // Get the bounds of the current map viewport
+            var bounds = map.getBounds();
+            var zoom = map.getZoom(); 
+
+
+            // Iterate through each marker
+            for (var i = 0; i < markerArray.length; i++) {
+                var markerData = markerArray[i];
+                var marker = markerData.marker;
+
+                // Check if marker is within the bounds
+                if (isMarkerWithinBounds(marker, bounds)) {
+                    // Add marker name to markerOnScreen array
+                    markerOnScreen.push(markerData.name);
+                }
+            }
+
+            // Now, markerOnScreen array contains names of markers visible on the screen
+            console.log("Markers on screen:", markerOnScreen);
+            console.log("Number of markers on screen:", markerOnScreen.length); // Dynamically check the length
+            console.log('zoom level' + zoom);
+            if (markerOnScreen.length === 1 && zoom > 16) {
+               if(markerOnScreen[0]==='School 1'){
+                window.location.href = window.location.href = 'school1/School1.html'; 
+               }
+               else if(markerOnScreen[0]==='School 2'){
+                window.location.href = window.location.href = 'school2/School2.html';
+               }
+               else if(markerOnScreen[0]==='School 3'){
+                window.location.href = window.location.href = 'school3/School3.html';
+               }
+               else if(markerOnScreen[0]==='Chicago Jesuit Academy'){
+                window.location.href = window.location.href = 'chicagoJesuitAcademy/chicagoJesuitAcademy.html';
+               }
+            }
+
+        });
+
+
+        // Function to check if a marker is within the bounds
+        function isMarkerWithinBounds(marker, bounds) {
+            var lngLat = marker.getLngLat();
+            return lngLat.lng >= bounds._sw.lng && lngLat.lng <= bounds._ne.lng &&
+                   lngLat.lat >= bounds._sw.lat && lngLat.lat <= bounds._ne.lat;
+        }
+   </script>
+</body>
+</html>
