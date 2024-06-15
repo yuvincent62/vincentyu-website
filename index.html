@@ -34,6 +34,7 @@
 
             // Create popup
             var popup = new maplibregl.Popup({
+                offset: 25,
                 closeButton: false,
                 closeOnClick: false
             });
@@ -92,7 +93,7 @@
             console.log("Markers on screen:", markerOnScreen);
             console.log("Number of markers on screen:", markerOnScreen.length); // Dynamically check the length
             console.log('zoom level' + zoom);
-            if (markerOnScreen.length === 1 && zoom > 16) {
+            if (markerOnScreen.length === 1 || zoom > 16) {
                if(markerOnScreen[0]==='School 1'){
                 window.location.href = window.location.href = 'school1/School1.html'; 
                }
