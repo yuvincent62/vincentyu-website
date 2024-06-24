@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>School Project</title>
+  <title>School Porject</title>
   <link rel="stylesheet" href="stylefile.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -130,17 +130,10 @@
       const currentFloor = options.topOption;
       const currentParameter = activeBottomButtonText;
       let colorArray = [];
-      console.log('floor: ' + currentFloor);
-      console.log('Parameter: ' + currentParameter);
-      console.log('school' + currentSchool);
-
       zoomLevel = (map.getZoom() === 20.5);
-
       if (zoomLevel) {
         colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
-        console.log('9999999999' + colorArray);
       }
-
       updateMarkerColors(colorArray);
     }
 
@@ -164,9 +157,10 @@
         topCanvas.appendChild(buttonContainer);
       });
 
-      var activeButton = document.getElementById(activeTopButtonId);
-      if (activeButton) {
-        activateButton(activeButton, 'topCanvas');
+      // Ensure the first button is active
+      var firstButton = topCanvas.querySelector('.buttonTop');
+      if (firstButton) {
+        activateButton(firstButton, 'topCanvas');
       }
     }
 
@@ -279,9 +273,7 @@
       showNumberPopup() {
         if (this.marker.options.opacity === 1) {
           this.marker.bindPopup(`<b>${this.number}</b>`).openPopup();
-        } else {
-          console.log(`Marker ${this.name} is not visible.`);
-        }
+        } 
       }
 
       hideNumberPopup() {
@@ -342,8 +334,16 @@
         showCanvas('bottomCanvas');
         defineAndDisplayRoomMarkers(schoolSelection, options.topOption);
 
-        document.getElementById('top1').click();
-        document.getElementById('btn3').click();
+        // Click the first button in topCanvas and the third button in bottomCanvas
+        var firstTopButton = document.querySelector('#topCanvas .buttonTop');
+        if (firstTopButton) {
+          firstTopButton.click();
+        }
+
+        var thirdBottomButton = document.querySelectorAll('#bottomCanvas .buttonBottom')[2];
+        if (thirdBottomButton) {
+          thirdBottomButton.click();
+        }
       } else {
         for (let i = 0; i < arrayLength; i++) {
           markerArray[i].setOpacity(1);
@@ -359,13 +359,8 @@
       clearRoomMarkers();
 
       const bottomOption = activeBottomButtonText;
-      console.log('1111' + school);
-      console.log('222' + floor);
-      console.log('3333' + bottomOption);
-//      if(school && floor && bottomOption){
-        const valueArray = SetValueArray(school, floor, bottomOption);
-        console.log('*****' + valueArray);
-//      }
+      const valueArray = SetValueArray(school, floor, bottomOption);
+
       if (school === 1) {
         if (floor === 'Ground') {
           addRoomMarker('Room 111', 'red', 40, 40, 41.877425, -87.75188, 'G14', valueArray[0]);
@@ -471,9 +466,7 @@
         marker.on('mouseover', function() {
           if (this.options.opacity === 1) {
             this.openPopup();
-          } else {
-            console.log(`Marker ${this.options.name} is not visible.`);
-          }
+          } 
         });
 
         marker.on('mouseout', function() {
@@ -498,9 +491,7 @@
       var canvas = document.getElementById(canvasId);
       if (canvas) {
         canvas.style.display = 'none';
-      } else {
-        console.error('Canvas with ID ' + canvasId + ' not found.');
-      }
+      } 
     }
 
     function showCanvas(canvasId) {
@@ -510,9 +501,7 @@
         if (canvasId === 'bottomCanvas') {
           canvas.style.flexDirection = 'column';
         }
-      } else {
-        console.error('Canvas with ID ' + canvasId + ' not found.');
-      }
+      } 
     }
 
     document.getElementById('topCanvas').addEventListener('click', function(event) {
