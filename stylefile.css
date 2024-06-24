@@ -1,11 +1,69 @@
-body {
-    margin: 0;
-    padding: 0;
+    /* Set the map to fill the entire screen */
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    /* Ensure body takes full width */
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    /* Ensure map container flexes to fill available space */
+    #map {
+      flex: 1;
+    }
+    /* Style for top middle canvas */
+    #topCanvas {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      gap: 10px; /* Space between buttons */
+    }
+    /* Style for bottom left canvas */
+    #bottomCanvas {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 5px; /* Space between buttons */
+    }
+
+.button, .buttonTop, .buttonBottom {
+  border: 2px solid black;
+  padding: 10px;
+  background-color: white;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 5px;
+  border-radius: 5px;
 }
 
-#map {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 100%;
+.button.active, .buttonTop.active, .buttonBottom.active {
+  background-color: green;
+  color: white;
+}
+
+#topCanvas, #bottomCanvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+}
+
+#bottomCanvas {
+  flex-direction: column;
 }
