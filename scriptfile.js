@@ -1,116 +1,192 @@
-        const map = new maplibregl.Map({
-            container: 'map',
-            style: `https://api.maptiler.com/maps/streets-v2/style.json?key=mYUHicVKQ6OkT3ldd3Mz`,
-            center: [-89.4012, 43.0731],
-            zoom: 6
-        })
+//generate data
+// Function to generate a random number within a specified range
+function getRandomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
-        let markerArray=[];
-        let markerOnScreen=[];
-
-        //add school markers
-        var marker1 = new maplibregl.Marker()
-            .setLngLat([-89.4012, 43.0731])
-            .addTo(map);
-            markerArray.push(marker1);
-
-            console.log('&&&'+ markerArray[0].options.name);
-    
-        var popup1 = new maplibregl.Popup({
-            closeButton: false,
-            closeOnClick: false
-        });
-    
-        marker1.getElement().addEventListener('mouseenter', function() {
-            popup1.setLngLat(marker1.getLngLat())
-                .setHTML('<h3>School 1</h3>') 
-                .addTo(map);
-        });
-    
-        marker1.getElement().addEventListener('mouseleave', function() {
-            popup1.remove();
-        }); 
-
-        marker1.getElement().addEventListener('click', function() {
-            // Open another webpage in the same folder
-            window.location.href = 'school1/School1.html'; 
-            });
-
-        var marker2 = new maplibregl.Marker()
-        .setLngLat([-89.31810542269284, 43.09598171954781]) 
-        .addTo(map);
-
-        var popup2 = new maplibregl.Popup({
-            closeButton: false,
-            closeOnClick: false
-        });
-
-        marker2.getElement().addEventListener('mouseenter', function() {
-            popup2.setLngLat(marker2.getLngLat())
-                .setHTML('<h3>School 2</h3>') // Replace with your hover text
-                .addTo(map);
-        });
-
-        marker2.getElement().addEventListener('mouseleave', function() {
-            popup2.remove();
-        });
-
-        marker2.getElement().addEventListener('click', function() {
-        // Open another webpage in the same folder
-        window.location.href = 'school2/School2.html'; 
-         });
-
-        var marker3 = new maplibregl.Marker()
-        .setLngLat([-89.3122, 	43.1202]) 
-        .addTo(map);
-
-        var popup3 = new maplibregl.Popup({
-            closeButton: false,
-            closeOnClick: false
-        });
-
-        marker3.getElement().addEventListener('mouseenter', function() {
-            popup3.setLngLat(marker3.getLngLat())
-                .setHTML('<h3>School 3</h3>') // Replace with your hover text
-                .addTo(map);
-        });
-
-        marker3.getElement().addEventListener('mouseleave', function() {
-            popup3.remove();
-        });
-
-        marker3.getElement().addEventListener('click', function() {
-            // Open another webpage in the same folder
-            window.location.href = 'school3/School3.html'; 
-            }); 
-            
-
-        var marker4 = new maplibregl.Marker()
-        .setLngLat([-87.751678, 	41.877331]) 
-        .addTo(map);
-    
-        var popup4 = new maplibregl.Popup({
-            closeButton: false,
-            closeOnClick: false
-        });
-    
-        marker4.getElement().addEventListener('mouseenter', function() {
-            popup4.setLngLat(marker4.getLngLat())
-                .setHTML('<h3>Chicago Jesuit Academy </h3>') // Replace with your hover text
-                .addTo(map);
-        });
-    
-        marker4.getElement().addEventListener('mouseleave', function() {
-            popup4.remove();
-        });
-    
-        marker4.getElement().addEventListener('click', function() {
-            // Open another webpage in the same folder
-            window.location.href = 'chicagoJesuitAcademy/chicagoJesuitAcademy.html'; 
-            }); 
-
- 
-        map.on('error', function(err) {
+// Function to generate sensor arrays for specified number of rooms
+function generateSensorArrays(numSensor) {
+  let sensorArrays = [];
   
-            throw new Error("To load the map, you must replace YOUR_MAPTILER_API_KEY_HERE first, see README");
-        });
+  for (let sensor = 1; sensor <= numSensor; sensor++) {
+    let array = [];
+    for (let i = 0; i < 6; i++) {
+      switch (i) {
+        case 0: // CO2
+          array.push(getRandomNumber(400, 2500));
+          break;
+        case 1: // PM2.5
+          array.push(getRandomNumber(10, 30));
+          break;
+        case 2: // Dew point
+          array.push(getRandomNumber(30, 70));
+          break;
+        case 3: // TVOC
+          array.push(getRandomNumber(0, 12));
+          break;
+        case 4: // Temperature
+          array.push(getRandomNumber(40, 100));
+          break;
+        case 5: // Relative humidity
+          array.push(getRandomNumber(10, 100));
+          break;
+      }   
+    }
+    sensorArrays.push(array);
+  }
+  return sensorArrays;
+}
+  //generate data for each floor
+const array11 = generateSensorArrays(4)
+const array12 = generateSensorArrays(9);
+const array13 = generateSensorArrays(7);
+const array21 = generateSensorArrays(2);
+const array22 = generateSensorArrays(2);
+
+function SetColorArray(school, floor, airQuality){
+  let colorAy=[];
+  let currentFloorData;
+  if(school===1){
+    if(floor==='Ground'){
+      currentFloorData=array11;
+    }else if (floor==='First'){
+      currentFloorData=array12
+    }else if(floor==='Second'){
+      currentFloorData=array13;
+    }
+  }else if(school===2){
+    if(floor==='Floor1'){
+      currentFloorData=array21;
+    }else if(floor==='Floor2'){
+      currentFloorData=array22;
+    }
+  } 
+  if (airQuality=='CO2'){
+    currentParameterData = getColumn(currentFloorData, 0);
+  } 
+  else if (airQuality=='PM2.5'){
+    currentParameterData = getColumn(currentFloorData, 1);
+  }
+  else if (airQuality=='Dew Point'){
+    currentParameterData = getColumn(currentFloorData, 2);
+  }
+  else if(airQuality=='TVOC'){
+    currentParameterData = getColumn(currentFloorData, 3);
+  }
+  else if (airQuality=='Temperature'){
+    currentParameterData = getColumn(currentFloorData, 4);
+  }
+  else if (airQuality=='Relative Humidity'){
+    currentParameterData = getColumn(currentFloorData, 5);
+  }
+  const sensorAmount = currentFloorData.length;
+  const dim = checkDim(airQuality);
+
+  roomColor=[];
+  for(let i=0;i<sensorAmount;i++){
+    workingData = evaluateNumber(currentParameterData[i], dim);
+    roomColor.push(workingData);
+  }
+  return roomColor;
+}
+
+function SetValueArray(school, floor, airQuality){
+  let currentFloorData;
+  if(school===1){
+    if(floor==='Ground'){
+      currentFloorData=array11;
+    }else if (floor==='First'){
+      currentFloorData=array12
+    }else if(floor==='Second'){
+      currentFloorData=array13;
+    }
+  }else if(school===2){
+    if(floor==='Floor1'){
+      currentFloorData=array21;
+    }else if(floor==='Floor2'){
+      currentFloorData=array22;
+    }
+  } 
+  if (airQuality=='CO2'){
+    currentParameterData = getColumn(currentFloorData, 0);
+  } 
+  else if (airQuality=='PM2.5'){
+    currentParameterData = getColumn(currentFloorData, 1);
+  }
+  else if (airQuality=='Dew Point'){
+    currentParameterData = getColumn(currentFloorData, 2);
+  }
+  else if(airQuality=='TVOC'){
+    currentParameterData = getColumn(currentFloorData, 3);
+  }
+  else if (airQuality=='Temperature'){
+    currentParameterData = getColumn(currentFloorData, 4);
+  }
+  else if (airQuality=='Relative Humidity'){
+    currentParameterData = getColumn(currentFloorData, 5);
+  }
+  return currentParameterData;
+}
+
+console.log('*****************' + SetValueArray(1, 'Ground', 'CO2'));
+
+
+const thresholds = {
+  dim1: { red: [2000, -10], yellow: [1000, -5] },
+  dim2: { red: [25, -10], yellow: [18, -5] },
+  dim3: { red: [60, -10], yellow: [55, -5] },
+  dim4: { red: [10, -10], yellow: [1, -5] },
+  dim5: { red: [90, 55], yellow: [81, 65] },
+  dim6: { red: [80, 20], yellow: [60, 30] }
+};
+
+function evaluateNumber(number, dim) {
+  const threshold = thresholds['dim' + dim];
+  const redMax = threshold.red[0];
+  const redMin = threshold.red[1];
+  const yellowMax = threshold.yellow[0];
+  const yellowMin = threshold.yellow[1];
+
+  if (number > redMax || number < redMin) {
+      return 'red';
+  } else if ((number < redMax && number > yellowMax) || (number < yellowMin && number > redMin)) {
+      return 'yellow';
+  } else {
+      return 'green';
+  }
+}
+
+function checkDim(input){
+  if (input=='CO2'){
+    return 1;
+  }
+  else if (input=='PM2.5'){
+    return 2;
+  }
+  else if (input=='Dew Point'){
+    return 3;
+  }
+  else if (input=='TVOC'){
+    return 4;
+  }
+  else if (input=='Temperature'){
+    return 5;
+  }
+  else {
+    return 6;
+  }
+}
+
+function getColumn(array, i) {
+    // Create an empty array to store the elements of the column
+    var column = [];
+
+    // Loop through each row of the array
+    for (var j = 0; j < array.length; j++) {
+        // Push the element at index i of each row to the column array
+        column.push(array[j][i]);
+    }
+
+    // Return the column array
+    return column;
+}
