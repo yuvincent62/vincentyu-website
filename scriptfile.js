@@ -1,3 +1,178 @@
+var zoomLevel = false;
+var schoolSelection = null;
+var map;
+var markerArray = [];
+var roomMarkers = [];
+var activeTopButtonId = 'top1';
+var activeBottomButtonText = 'Dew Point';
+var initialMapCenter = [43.0731, -89.4012];
+var initialMapZoom = 8;
+
+var options = {
+  topOption: 'Ground',
+  bottomOption: 'Dew Point'
+};
+
+function activateButton(button, canvasId) {
+  var canvasType = canvasId === 'topCanvas' ? 'topOption' : 'bottomOption';
+
+  var buttons = document.querySelectorAll('#' + canvasId + ' .button, #' + canvasId + ' .buttonTop, #' + canvasId + ' .buttonBottom');
+  buttons.forEach(function(btn) {
+    btn.classList.remove('active');
+    btn.style.backgroundColor = "white";
+    btn.style.color = "black";
+  });
+
+  button.classList.add('active');
+  button.style.backgroundColor = "green";
+  button.style.color = "white";
+
+  options[canvasType] = button.nextElementSibling.textContent.trim();
+
+  if (canvasId === 'topCanvas') {
+    activeTopButtonId = button.id;
+  } else if (canvasId === 'bottomCanvas') {
+    activeBottomButtonText = button.nextElementSibling.textContent.trim();
+  }
+
+  onOptionChange(canvasType, options[canvasType]);
+
+  const currentSchool = schoolSelection;
+  const currentFloor = options.topOption;
+  const currentParameter = activeBottomButtonText;
+  let colorArray = [];
+  zoomLevel = (map.getZoom() === 20.5);
+  if (zoomLevel) {
+    colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
+  }
+  updateMarkerColors(colorArray);
+}
+
+    function createTopCanvasButtons(school) {
+      var topCanvas = document.getElementById('topCanvas');
+      topCanvas.innerHTML = '';
+
+      var buttonNames = school === 1 ? ['Ground', 'First', 'Second'] : ['Floor1', 'Floor2'];
+      buttonNames.forEach(function(name, index) {
+        var buttonContainer = document.createElement('div');
+        buttonContainer.className = 'buttonContainer';
+        var button = document.createElement('button');
+        button.id = 'top' + (index + 1);
+        button.className = 'buttonTop';
+        button.onclick = function() { activateButton(this, 'topCanvas'); };
+        var span = document.createElement('span');
+        span.className = 'buttonText';
+        span.textContent = name;
+        buttonContainer.appendChild(button);
+        buttonContainer.appendChild(span);
+        topCanvas.appendChild(buttonContainer);
+      });
+
+      // Ensure the first button is active
+      var firstButton = topCanvas.querySelector('.buttonTop');
+      if (firstButton) {
+        activateButton(firstButton, 'topCanvas');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var initialMapCenter = [43.0731, -89.4012];
+      var initialMapZoom = 8;
+  
+      function returnToInitialMapView() {
+        console.log("Return button clicked");
+        map.setView(initialMapCenter, initialMapZoom);
+      }
+  
+      document.getElementById('returnButton').addEventListener('click', returnToInitialMapView);
+    });
+  
+      function createPiechartIcon(data, size, text) {
+        function percentageToAngle(percentage) {
+          return (percentage / 100) * 360;
+        }
+  
+        function describeArc(x, y, radius, startAngle, endAngle) {
+          var start = polarToCartesian(x, y, radius, endAngle);
+          var end = polarToCartesian(x, y, radius, startAngle);
+          var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+  
+          var d = [
+            "M", x, y,
+            "L", start.x, start.y,
+            "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+            "Z"
+          ].join(" ");
+          return d;
+        }
+  
+        function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+          var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+          return {
+            x: centerX + (radius * Math.cos(angleInRadians)),
+            y: centerY + (radius * Math.sin(angleInRadians))
+          };
+        }
+  
+        var startAngle = 0;
+        var paths = data.map(function(segment) {
+          var endAngle = startAngle + percentageToAngle(segment.percentage);
+          var path = describeArc(16, 16, 16, startAngle, endAngle);
+          startAngle = endAngle;
+          return `<path d="${path}" fill="${segment.color}"/>`;
+        }).join("");
+  
+        var svg = `
+          <svg width="${size}" height="${size}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            ${paths}
+            <circle cx="16" cy="16" r="10" fill="white"/>
+            <text x="16" y="21" font-size="10" text-anchor="middle" fill="#000">${text}</text>
+          </svg>`;
+        var url = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+        return new L.Icon({
+          iconUrl: url,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+          popupAnchor: [0, -size / 2]
+        });
+      }
+
+      function createColoredIcon(color, width, height, text) {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, width, height);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'black';
+      ctx.strokeRect(0, 0, width, height);
+
+      ctx.font = '16px Arial';
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.fillText(text, width / 2, height / 2);
+
+      return L.icon({
+        iconUrl: canvas.toDataURL(),
+        iconSize: [width, height],
+        iconAnchor: [width / 2, height / 2]
+      });
+    }
+
+
+
+
+
+
+
+
+
+
+
 //generate data
 // Function to generate a random number within a specified range
 function getRandomNumber(min, max) {
@@ -190,3 +365,6 @@ function getColumn(array, i) {
     // Return the column array
     return column;
 }
+
+
+
