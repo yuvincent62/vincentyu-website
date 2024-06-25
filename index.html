@@ -3,11 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>School Porject</title>
+  <title>School Project</title>
   <link rel="stylesheet" href="stylefile.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="rooms.js"></script>
   <style>
+    #map {
+      height: 100vh;
+    }
     .button, .buttonTop, .buttonBottom {
       border: 2px solid black;
       background-color: white;
@@ -22,6 +26,7 @@
       align-items: center;
       justify-content: center;
       position: relative;
+      z-index: 1001; /* Ensure buttons are clickable */
     }
 
     .button.active, .buttonTop.active, .buttonBottom.active {
@@ -61,12 +66,63 @@
 
     #bottomCanvas {
       flex-direction: column;
+      background-color: transparent;
     }
+
+    #topCanvas, #returnCanvas {
+      position: absolute;
+      top: 10px;
+      background-color: transparent;
+      padding: 10px;
+      border-radius: 10px;
+      z-index: 1000;
+      display: flex;
+    }
+
+
+    #returnCanvas {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent; /* Change to transparent */
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 1000;
+  display: flex;
+}
+
+
+    #topCanvas {
+      right: 60px;
+    }
+
+    #returnCanvas {
+      right: 10px;
+    }
+
+   
+    #returnButton {
+      width: 100px;             /* Set the width */
+      height: 50px;             /* Set the height */
+      border: 2px solid #000;   /* Set border width, style, and color */
+      border-radius: 5px;       /* Set border radius for rounded corners */
+      background-color:rgb(205, 205, 187);  /* #d3e27e; /* Set background color */
+      color: black;           /* Set text color */
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div id="topCanvas"></div>
+  <div id="returnCanvas">
+    <div class="buttonContainer">
+      <button id="returnButton" class="buttonTop">Reset</button>
+
+    </div>
+  </div>
   <div id="bottomCanvas">
     <div class="bottomButtonContainer">
       <button id="btn1" class="button buttonBottom"></button><span class="bottomButtonText">CO2</span>
@@ -96,6 +152,8 @@
     var roomMarkers = [];
     var activeTopButtonId = 'top1';
     var activeBottomButtonText = 'Dew Point';
+    var initialMapCenter = [43.0731, -89.4012];
+    var initialMapZoom = 8;
 
     var options = {
       topOption: 'Ground',
@@ -163,6 +221,18 @@
         activateButton(firstButton, 'topCanvas');
       }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+  var initialMapCenter = [43.0731, -89.4012];
+  var initialMapZoom = 8;
+
+  function returnToInitialMapView() {
+    console.log("Return button clicked");
+    map.setView(initialMapCenter, initialMapZoom);
+  }
+
+  document.getElementById('returnButton').addEventListener('click', returnToInitialMapView);
+});
 
     function createPiechartIcon(data, size, text) {
       function percentageToAngle(percentage) {
@@ -355,48 +425,6 @@
       }
     }
 
-    function defineAndDisplayRoomMarkers(school, floor) {
-      clearRoomMarkers();
-
-      const bottomOption = activeBottomButtonText;
-      const valueArray = SetValueArray(school, floor, bottomOption);
-
-      if (school === 1) {
-        if (floor === 'Ground') {
-          addRoomMarker('Room 111', 'red', 40, 40, 41.877425, -87.75188, 'G14', valueArray[0]);
-          addRoomMarker('Room 112', 'green', 180, 32, 41.8772905, -87.7517385, 'Admin Hall', valueArray[1]);
-          addRoomMarker('Room 113', 'yellow', 165, 200, 41.87721, -87.75148, 'G26', valueArray[2]);
-          addRoomMarker('Room 114', 'green', 140, 240, 41.8771875, -87.751719, 'G33', valueArray[3]);
-        } else if (floor === 'First') {
-          addRoomMarker('Room 121', 'green', 120, 95, 41.87721, -87.75238, '115', valueArray[0]);
-          addRoomMarker('Room 122', 'green', 110, 100, 41.877435, -87.751698, '134', valueArray[1]);
-          addRoomMarker('Room 123', 'green', 110, 100, 41.877435, -87.751588, '135', valueArray[2]);
-          addRoomMarker('Room 124', 'yellow', 110, 100, 41.877435, -87.75148, '136', valueArray[3]);
-          addRoomMarker('Room 125', 'red', 110, 100, 41.877311, -87.751842, '137', valueArray[4]);
-          addRoomMarker('Room 126', 'grey', 110, 100, 41.877311, -87.751735, '138', valueArray[5]);
-          addRoomMarker('Room 127', 'green', 125, 110, 41.87725, -87.75146, '141', valueArray[6]);
-          addRoomMarker('Room 128', 'green', 100, 75, 41.877241, -87.751612, '142', valueArray[7]);
-          addRoomMarker('Room 129', 'red', 275, 380, 41.877081, -87.75153, '143', valueArray[8]);              
-        } else if (floor === 'Second') {
-          addRoomMarker('Room 131', 'grey', 110, 100, 41.87721, -87.75225, '210', valueArray[0]);
-          addRoomMarker('Room 132', 'green', 110, 100, 41.877435, -87.751698, '231', valueArray[1]);
-          addRoomMarker('Room 133', 'green', 110, 100, 41.877435, -87.751588, '232', valueArray[2]);
-          addRoomMarker('Room 134', 'yellow', 110, 100, 41.877435, -87.75148, '233', valueArray[3]);
-          addRoomMarker('Room 135', 'yellow', 110, 100, 41.877311, -87.751815, '234', valueArray[4]);
-          addRoomMarker('Room 136', 'red', 110, 100, 41.877311, -87.751708, '235', valueArray[5]);
-          addRoomMarker('Room 137', 'red', 110, 100, 41.877311, -87.75149, '236', valueArray[6]);
-        }
-      } else if (school === 2) {
-        if (floor === 'Floor1') {
-          addRoomMarker('Room 211', 'red', 110, 100, 43.07315, -89.40125, '001', valueArray[0]);
-          addRoomMarker('Room 212', 'green', 110, 100, 43.07308, -89.40112, '002', valueArray[1]);
-        } else if (floor === 'Floor2') {
-          addRoomMarker('Room 221', 'yellow', 110, 100, 43.07305, -89.40128, '003', valueArray[0]);
-          addRoomMarker('Room 222', 'grey', 110, 100, 43.07314, -89.40124, '004', valueArray[1]);
-        }
-      }
-    }
-
     function addRoomMarker(name, color, width, height, lat, lng, text, number) {
       var roomMarker = new classSensor(name, color, width, height, lat, lng, text, number);
       roomMarkers.push(roomMarker);
@@ -424,16 +452,18 @@
     function onOptionChange(prop, value) {
       console.log(`The ${prop} was changed to ${value}`);
       if (prop === 'topOption') {
-        defineAndDisplayRoomMarkers(schoolSelection, value);
+        defineAndDisplayRoomMarkers(schoolSelection, value, activeBottomButtonText);
       } else if (prop === 'bottomOption') {
-        defineAndDisplayRoomMarkers(schoolSelection, options.topOption);
+        defineAndDisplayRoomMarkers(schoolSelection, options.topOption, activeBottomButtonText);
       }
     }
 
     function initMap() {
       var options = {
-        center: [43.0731, -89.4012],
-        zoom: 8
+        center: initialMapCenter,
+        zoom: initialMapZoom,
+        zoomDelta: 2,  // Double the zoom speed for button clicks
+        wheelPxPerZoomLevel: 50  // Adjust the zoom speed for mouse wheel
       };
 
       map = L.map('map', options);
@@ -458,9 +488,23 @@
       marker1.bindPopup("<b>Chicago Jesuit Academy</b>");
       markerArray.push(marker1);
 
+      // Attach click event listener to the marker1
+      marker1.on('click', function(e) {
+        var lng = e.latlng.lng;
+        var lat = e.latlng.lat;
+        onMarkerClick(lat, lng);
+      });
+
       const marker2 = L.marker([43.0731, -89.4012], { icon: createPiechartIcon(pieData2, 70, "4"), name: "School 2", zIndexOffset: 1000 }).addTo(map);
       marker2.bindPopup("<b>School 2</b>");
       markerArray.push(marker2);
+
+      // Attach click event listener to the marker2
+      marker2.on('click', function(e) {
+        var lng = e.latlng.lng;
+        var lat = e.latlng.lat;
+        onMarkerClick(lat, lng);
+      });
 
       markerArray.forEach(function(marker) {
         marker.on('mouseover', function() {
@@ -485,6 +529,9 @@
       updateVisibleMarkers();
 
       activateButton(document.getElementById('btn3').parentElement.querySelector('.button'), 'bottomCanvas');
+
+      // Add event listener for the Return button
+      document.getElementById('returnButton').addEventListener('click', returnToInitialMapView);
     }
 
     function hideCanvas(canvasId) {
@@ -518,6 +565,11 @@
     });
 
     document.addEventListener('DOMContentLoaded', initMap);
+
+    function onMarkerClick(lat, lng) {
+      console.log("Marker clicked at latitude:", lat, "and longitude:", lng);
+      map.setView([lat, lng], 20);
+    }
   </script>
   <script src="scriptfile.js"></script>
 </body>
