@@ -1,0 +1,80 @@
+#canvasContainer4 {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 70%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 1px solid #ccc;
+  display: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+#canvas4 {
+  width: 100%;
+  height: calc(100% - 40px);
+  background-color: white;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.top-buttons, .chart-buttons {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.button-container {
+  display: flex;
+  align-items: center;
+  margin: 5px;
+}
+.chart-parameter, .chart-date {
+  background-color: white;
+  color: white;
+  border: 2px solid black;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.chart-parameter.active, .chart-date.active {
+  background-color: #4CAF50;
+}
+#closeButton, #getCSVButton {
+  width: 50%;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 0;
+}
+#closeButton {
+  left: 0;
+  background-color: greenyellow; /* Red */
+  border-right: 1px solid #000; /* Black border */
+  color: black;
+}
+#getCSVButton {
+  right: 0;
+  background-color: #008CBA; /* Blue */
+  border-left: 1px solid #000; /* Black border */
+  color: black;
+}
+.label {
+  margin-left: 10px;
+  font-size: 14px;
+  color: black;
+}
+#curveCanvas {
+  width: calc(100% - 60px); /* Adjust the margin */
+  height: 100%;
+  border: 1px solid #000000;
+  margin: 0 50px; /* Increase margin to 10px on both sides */
+}
