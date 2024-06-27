@@ -148,6 +148,7 @@
     var initialMapZoom = 8;
     var activeChartParameter = 'CO2'; // Default active parameter
     var activeChartDate = 'hour'; // Default active date
+    var activeRoomName = ''; // Default active room name
 
     var options = {
       topOption: 'Ground',
@@ -277,13 +278,16 @@
       // Clear the canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Use activeChartParameter, activeChartDate, schoolSelection, activeTopButtonId, and activeBottomButtonText
+      // Use activeChartParameter, activeChartDate, schoolSelection, activeTopButtonId, activeBottomButtonText, and activeRoomName
       // to create data for the curve.
       console.log('Drawing curve with parameters:');
-      console.log('@@@Parameter:', activeChartParameter);
-      console.log('###School:', schoolSelection);
-      console.log('$$$Top Button:', activeTopButtonId);
-      console.log('$$$Bottom Button:', activeBottomButtonText);
+      console.log('Parameter:', activeChartParameter);
+      console.log('Date:', activeChartDate);
+      console.log('School:', schoolSelection);
+      console.log('Top Button:', activeTopButtonId);
+      console.log('Bottom Button:', activeBottomButtonText);
+      console.log('%%%Top Option:', options.topOption);
+      console.log('###Room Name:', activeRoomName); // Log the room name
 
       // Example data (replace with actual data based on selection)
       var data = [10, 20, 15, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
@@ -306,7 +310,8 @@
       ctx.stroke();
     }
 
-    function showCanvas4() {
+    function showCanvas4(roomName) {
+      activeRoomName = roomName; // Set the active room name
       document.getElementById('canvasContainer4').style.display = 'block';
       document.getElementById('overlay').style.display = 'block';
 
@@ -339,8 +344,8 @@
         this.icon = createColoredIcon(color, width, height, text);
         this.marker = L.marker([lat, lng], { icon: this.icon, zIndexOffset: 100 }).addTo(map);
         this.marker.bindPopup(`<b>${this.name}</b>`);
-        this.showCanvas4 = this.showCanvas4.bind(this);  // Bind the method
-        this.marker.on('click', this.showCanvas4);
+        this.showCanvas4 = this.showCanvas4.bind(this);
+        this.marker.on('click', () => this.showCanvas4(name)); // Pass the room name
         this.marker.on('mouseover', () => this.showNumberPopup());
         this.marker.on('mouseout', () => this.hideNumberPopup());
       }
@@ -351,7 +356,8 @@
         this.marker.setIcon(this.icon);
       }
 
-      showCanvas4() {
+      showCanvas4(roomName) {
+        activeRoomName = roomName; // Set the active room name
         document.getElementById('canvasContainer4').style.display = 'block';
         document.getElementById('overlay').style.display = 'block';
 
@@ -571,7 +577,8 @@
       map.setView([lat, lng], 20);
     }
 
-    function showCanvas4() {
+    function showCanvas4(roomName) {
+      activeRoomName = roomName; // Set the active room name
       document.getElementById('canvasContainer4').style.display = 'block';
       document.getElementById('overlay').style.display = 'block';
 
@@ -598,6 +605,8 @@
       console.log("activeBottomButtonText:", activeBottomButtonText);
       console.log("activeChartParameter:", activeChartParameter);
       console.log("activeChartDate:", activeChartDate);
+      console.log("options.topOption:", options.topOption);
+      console.log("activeRoomName:", activeRoomName);
     }
 
     // Call the function every 10 seconds
