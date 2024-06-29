@@ -46,6 +46,33 @@
       justify-content: space-between;
       align-items: center;
     }
+
+    /* CSS for scaling down buttons */
+    @media (max-width: 600px) {
+      .chart-parameter, .chart-date {
+        font-size: 12px; /* Adjust the font size */
+        padding: 5px 10px; /* Adjust the padding */
+      }
+
+      .button-container {
+        flex-direction: column; /* Stack buttons vertically */
+        align-items: center;
+      }
+
+      .label {
+        font-size: 10px; /* Adjust label font size */
+      }
+
+      #canvasContainer4 {
+        width: 90%; /* Make the container wider */
+        height: 80%; /* Increase the height */
+      }
+
+      #curveCanvas {
+        width: 100%; /* Ensure the canvas takes full width */
+        height: auto; /* Adjust height accordingly */
+      }
+    }
   </style>
 </head>
 <body>
@@ -183,7 +210,7 @@
       const currentFloor = options.topOption;
       const currentParameter = activeBottomButtonText;
       let colorArray = [];
-      zoomLevel = (map.getZoom() === 20.5);
+      zoomLevel = (map.getZoom() >= 18);
       if (zoomLevel) {
         colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
       }
@@ -394,7 +421,7 @@
 
       console.log('Visible Markers:', visibleMarkers.map(marker => marker.options.name));
 
-      zoomLevel = (map.getZoom() === 20.5);
+      zoomLevel = (map.getZoom() ===20.5);
       const arrayLength = markerArray.length;
 
       if (zoomLevel) {
@@ -601,8 +628,8 @@
     // Function to log current state
     function logCurrentState() {
       console.log("schoolSelection:", schoolSelection);
-      console.log("activeTopButtonId:", activeTopButtonId);
-      console.log("activeBottomButtonText:", activeBottomButtonText);
+//      console.log("activeTopButtonId:", activeTopButtonId);
+//      console.log("activeBottomButtonText:", activeBottomButtonText);
       console.log("activeChartParameter:", activeChartParameter);
       console.log("activeChartDate:", activeChartDate);
       console.log("options.topOption:", options.topOption);
@@ -616,3 +643,4 @@
   <script src="scriptfile.js"></script>
 </body>
 </html>
+
