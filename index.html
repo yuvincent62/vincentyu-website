@@ -21,6 +21,11 @@
       background-color: rgba(0, 0, 0, 0.5);
       z-index: 1001; /* Ensure overlay is above other elements */
     }
+    #buttonContainer{
+      z-index:1003;
+    }
+
+    
     #canvasContainer4 {
       position: fixed;
       top: 50%;
@@ -44,6 +49,27 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+    }
+
+    /* Default styles for buttons */
+    button.chart-parameter, button.chart-date {
+      font-size: 16px;
+      padding: 10px 20px;
+      width: 50px; /* Ensure buttons are circular */
+      height: 50px; /* Ensure buttons are circular */
+      border-radius: 50%; /* Make buttons circular */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .label {
+      font-size: 14px;
+    }
+
+    #curveCanvas {
+      width: 100%;
+      height: auto;
     }
 
     /* CSS for scaling down buttons */
@@ -76,8 +102,9 @@
       #curveCanvas {
         height: calc(100% - 60px); /* Adjust height considering padding and buttons */
       }
-          /* Adjust buttons in topCanvas and bottomCanvas */
-    #topCanvas .buttonTop, #bottomCanvas .buttonBottom {
+
+      /* Adjust buttons in topCanvas and bottomCanvas */
+      #topCanvas .buttonTop, #bottomCanvas .buttonBottom {
         width: 20px; /* Adjust width */
         height: 20px; /* Adjust height */
         margin: 0px; /* Remove margin */
@@ -87,7 +114,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-    }
+      }
     }
   </style>
 </head>
@@ -366,6 +393,7 @@
     function hideCanvas4() {
       document.getElementById('canvasContainer4').style.display = 'none';
       document.getElementById('overlay').style.display = 'none';
+      activeRoomName = ''; // Clear the active room name to prevent it from showing
     }
 
     document.getElementById('closeButton').onclick = hideCanvas4;
@@ -657,6 +685,7 @@
     function hideCanvas4() {
       document.getElementById('canvasContainer4').style.display = 'none';
       document.getElementById('overlay').style.display = 'none';
+      activeRoomName = ''; // Clear the active room name to prevent it from showing
     }
 
     document.getElementById('closeButton').onclick = hideCanvas4;
