@@ -21,24 +21,23 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
       prefix = 'TVOC';
       suffix = 'µg/m\u00B3';
   } else if (parameter === 'Relative Humidity') {
-      prefix = 'RH: '
+      prefix = 'RH: ';
       suffix = '%';
-  }  else if(parameter === 'Temperature'){
+  } else if (parameter === 'Temperature') {
       prefix = 'Temp: ';
       suffix = '\u00B0F';
   }
 
-  // Calculate the scale factor based on the current screen size
-  const referenceWidth = 1920;
-  const referenceHeight = 1080;
-  const scaleFactorWidth = window.innerWidth / referenceWidth;
-  const scaleFactorHeight = window.innerHeight / referenceHeight;
-  const scaleFactor = Math.min(scaleFactorWidth, scaleFactorHeight);
+  // Define scaleFactor (set it to your desired value)
+  const scaleFactor = 0.5; // Example value, set it as needed
+
+  // Check if viewport height is less than 550px
+  const shouldScale = window.innerHeight < 550;
 
   function addModifiedRoomMarker(room, color, width, height, lat, lng, code, value) {
-      // Adjust width and height based on the scale factor
-      const adjustedWidth = width * scaleFactor;
-      const adjustedHeight = height * scaleFactor;
+      // Adjust width and height based on the scale factor if necessary
+      const adjustedWidth = shouldScale ? width * scaleFactor : width;
+      const adjustedHeight = shouldScale ? height * scaleFactor : height;
       addRoomMarker(room, color, adjustedWidth, adjustedHeight, lat, lng, code, prefix + value + suffix);
   }
 
@@ -77,3 +76,5 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
       }
   }
 }
+
+
