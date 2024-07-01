@@ -76,6 +76,18 @@
       #curveCanvas {
         height: calc(100% - 60px); /* Adjust height considering padding and buttons */
       }
+          /* Adjust buttons in topCanvas and bottomCanvas */
+    #topCanvas .buttonTop, #bottomCanvas .buttonBottom {
+        width: 20px; /* Adjust width */
+        height: 20px; /* Adjust height */
+        margin: 0px; /* Remove margin */
+        font-size: 10px; /* Adjust font size */
+        padding: 0; /* Remove padding */
+        border-radius: 50%; /* Ensure buttons are circular */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     }
   </style>
 </head>
