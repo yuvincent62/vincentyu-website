@@ -41,17 +41,6 @@
       gap: 5px; /* Space between buttons */
     }
 
-.button, .buttonTop, .buttonBottom {
-  border: 2px solid black;
-  padding: 10px;
-  background-color: white;
-  color: black;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 5px;
-  border-radius: 5px;
-}
-
 .button.active, .buttonTop.active, .buttonBottom.active {
   background-color: green;
   color: white;
@@ -86,6 +75,17 @@
   justify-content: center;
   position: relative;
   z-index: 1001; /* Ensure buttons are clickable */
+}
+
+@media (max-height: 550px) {
+  .buttonTop, .buttonBottom, .bottomButtonText, .button.chart-parameter, .button.chart-date {
+      width: 20px;
+      height: 20px;
+      margin: 0px;
+      font-size: 10px;
+      align-items: center;
+      justify-content: center;
+  }
 }
 
 .button.active, .buttonTop.active, .buttonBottom.active {
@@ -170,3 +170,5 @@ display: flex;
   padding-left: 5px;
   padding-right: 5px;
 }
+
+/* CSS for scaling down buttons */
