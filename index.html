@@ -48,37 +48,47 @@
 
     /* CSS for scaling down buttons */
     @media (max-height: 550px) {
-    button.chart-parameter, button.chart-date {
-      width: 15px;
-      height: 15px;
-      margin: 0px;
-      font-size: 10px;
-      align-items: center;
-      justify-content: center;
-      padding: 0px;
-    }
+      button.chart-parameter, button.chart-date {
+        width: 30px; /* Adjust width */
+        height: 30px; /* Adjust height */
+        font-size: 10px; /* Adjust font size */
+        padding: 0; /* Remove padding */
+        border-radius: 50%; /* Ensure buttons are circular */
+      }
 
-    .label {
-        font-size: 10px;
-    }
+      .label {
+        font-size: 10px; /* Adjust font size */
+      }
 
-    #canvasContainer4 {
+      #canvasContainer4 {
         position: fixed;
         top: 50%;
         left: 50%;
         width: 95%;
         height: 100%;
-        transform: translate(-45%, -50%);
+        transform: translate(-50%, -50%);
         padding: 10px; /* Optional padding */
         background-color: white; /* Ensure background color covers the screen */
         box-sizing: border-box;
         z-index: 1002; /* Ensure it appears above other elements */
-    }
+      }
 
-    #curveCanvas {
+      #curveCanvas {
         height: calc(100% - 60px); /* Adjust height considering padding and buttons */
+      }
+          /* Adjust buttons in topCanvas and bottomCanvas */
+    #topCanvas .buttonTop, #bottomCanvas .buttonBottom {
+        width: 20px; /* Adjust width */
+        height: 20px; /* Adjust height */
+        margin: 0px; /* Remove margin */
+        font-size: 10px; /* Adjust font size */
+        padding: 0; /* Remove padding */
+        border-radius: 50%; /* Ensure buttons are circular */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-}
+    }
   </style>
 </head>
 <body>
@@ -674,4 +684,6 @@
   <script src="scriptfile.js"></script>
 </body>
 </html>
+
+
 
