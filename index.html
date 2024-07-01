@@ -21,7 +21,6 @@
       background-color: rgba(0, 0, 0, 0.5);
       z-index: 1001; /* Ensure overlay is above other elements */
     }
-
     #canvasContainer4 {
       position: fixed;
       top: 50%;
@@ -48,31 +47,38 @@
     }
 
     /* CSS for scaling down buttons */
-    @media (max-width: 600px) {
-      .chart-parameter, .chart-date {
-        font-size: 12px; /* Adjust the font size */
-        padding: 5px 10px; /* Adjust the padding */
-      }
-
-      .button-container {
-        flex-direction: column; /* Stack buttons vertically */
-        align-items: center;
-      }
-
-      .label {
-        font-size: 10px; /* Adjust label font size */
-      }
-
-      #canvasContainer4 {
-        width: 90%; /* Make the container wider */
-        height: 80%; /* Increase the height */
-      }
-
-      #curveCanvas {
-        width: 100%; /* Ensure the canvas takes full width */
-        height: auto; /* Adjust height accordingly */
-      }
+    @media (max-height: 550px) {
+    button.chart-parameter, button.chart-date {
+      width: 15px;
+      height: 15px;
+      margin: 0px;
+      font-size: 10px;
+      align-items: center;
+      justify-content: center;
+      padding: 0px;
     }
+
+    .label {
+        font-size: 10px;
+    }
+
+    #canvasContainer4 {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 95%;
+        height: 100%;
+        transform: translate(-45%, -50%);
+        padding: 10px; /* Optional padding */
+        background-color: white; /* Ensure background color covers the screen */
+        box-sizing: border-box;
+        z-index: 1002; /* Ensure it appears above other elements */
+    }
+
+    #curveCanvas {
+        height: calc(100% - 60px); /* Adjust height considering padding and buttons */
+    }
+}
   </style>
 </head>
 <body>
@@ -176,7 +182,7 @@
     var activeChartParameter = 'CO2'; // Default active parameter
     var activeChartDate = 'hour'; // Default active date
     var activeRoomName = ''; // Default active room name
-
+    var currentMaxZoom; // Global variable to hold current maximum zoom 
     var options = {
       topOption: 'Ground',
       bottomOption: 'Dew Point'
@@ -210,7 +216,7 @@
       const currentFloor = options.topOption;
       const currentParameter = activeBottomButtonText;
       let colorArray = [];
-      zoomLevel = (map.getZoom() === 20);
+      zoomLevel = (map.getZoom() === 20.5);
       if (zoomLevel) {
         colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
       }
@@ -421,7 +427,7 @@
 
       console.log('Visible Markers:', visibleMarkers.map(marker => marker.options.name));
 
-      zoomLevel = (map.getZoom() ===20.5);
+      zoomLevel = (map.getZoom() ===  map.getMaxZoom());
       const arrayLength = markerArray.length;
 
       if (zoomLevel) {
@@ -494,10 +500,20 @@
       }
     }
 
+    var manuMax = 19.5; // Replace this with your desired maximum zoom level for small viewports
+
+    function setMaxZoom() {
+        var viewportHeight = window.innerHeight;
+        currentMaxZoom = viewportHeight < 550 ? manuMax : 20.5; // Update global variable
+        console.log("Maximum Zoom Level:", currentMaxZoom);
+        return currentMaxZoom;
+    }
+
     function initMap() {
       var options = {
         center: initialMapCenter,
         zoom: initialMapZoom,
+        maxZoom: setMaxZoom(), // Initialize maxZoom
         zoomDelta: 2,
         wheelPxPerZoomLevel: 50
       };
@@ -505,7 +521,7 @@
       map = L.map('map', options);
 
       var googleLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 20.5,
+        maxZoom: options.maxZoom, // Use the same maxZoom
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: 'Map data &copy; Google'
       }).addTo(map);
@@ -567,6 +583,19 @@
       document.getElementById('returnButton').addEventListener('click', returnToInitialMapView);
     }
 
+    // Update maxZoom on window resize
+    window.addEventListener('resize', function() {
+      var newMaxZoom = setMaxZoom();
+      map.setMaxZoom(newMaxZoom); // Update the map's maxZoom dynamically
+
+      // Also update the tile layer's maxZoom
+      map.eachLayer(function(layer) {
+        if (layer instanceof L.TileLayer) {
+          layer.options.maxZoom = newMaxZoom;
+        }
+      });
+    });
+
     function hideCanvas(canvasId) {
       var canvas = document.getElementById(canvasId);
       if (canvas) {
@@ -601,7 +630,8 @@
 
     function onMarkerClick(lat, lng) {
       console.log("Marker clicked at latitude:", lat, "and longitude:", lng);
-      map.setView([lat, lng], 20);
+      console.log('*****' + map.getMaxZoom());
+      map.setView([lat, lng], map.getMaxZoom() - 0.5); // Adjust zoom to maxZoom
     }
 
     function showCanvas4(roomName) {
@@ -634,6 +664,7 @@
       console.log("activeChartDate:", activeChartDate);
       console.log("options.topOption:", options.topOption);
       console.log("activeRoomName:", activeRoomName);
+      console.log("currentMaxZoom:", currentMaxZoom); // Log the current maximum zoom level
     }
 
     // Call the function every 10 seconds
@@ -643,4 +674,3 @@
   <script src="scriptfile.js"></script>
 </body>
 </html>
-
