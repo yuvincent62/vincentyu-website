@@ -7,6 +7,7 @@ var activeTopButtonId = 'top1';
 var activeBottomButtonText = 'Dew Point';
 var initialMapCenter = [43.0731, -89.4012];
 var initialMapZoom = 8;
+let maxZoom = 20.5;
 
 var options = {
   topOption: 'Ground',
@@ -41,7 +42,7 @@ function activateButton(button, canvasId) {
   const currentFloor = options.topOption;
   const currentParameter = activeBottomButtonText;
   let colorArray = [];
-  zoomLevel = (map.getZoom() === 20.5);
+  zoomLevel = (map.getZoom() === currentMaxZoom);
   if (zoomLevel) {
     colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
   }
@@ -365,8 +366,5 @@ function getColumn(array, i) {
     // Return the column array
     return column;
 }
-
-
-
 
 
