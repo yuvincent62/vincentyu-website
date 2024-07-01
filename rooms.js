@@ -29,7 +29,7 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
   }
 
   // Define scaleFactor (set it to your desired value)
-  const scaleFactor = 0.65; // Example value, set it as needed
+  const scaleFactor = 0.5; // Example value, set it as needed
 
   // Check if viewport height is less than 550px
   const shouldScale = window.innerHeight < 550;
@@ -76,5 +76,6 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
       }
   }
 }
+
 
 
