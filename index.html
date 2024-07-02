@@ -30,7 +30,7 @@
       top: 50%;
       left: 50%;
       width: 50%;
-      height: 70%;
+      height: 60%;
       transform: translate(-50%, -50%);
       background-color: white;
       border: 1px solid #ccc;
@@ -65,6 +65,8 @@
         /* Remove padding */
         border-radius: 50%;
         /* Ensure buttons are circular */
+        margin: 2px;
+        /* Reduce margin */
       }
 
       .label {
@@ -77,10 +79,10 @@
         top: 50%;
         left: 50%;
         width: 95%;
-        height: 100%;
+        height: 90%;
         transform: translate(-50%, -50%);
-        padding: 10px;
-        /* Optional padding */
+        padding: 5px;
+        /* Reduce padding */
         background-color: white;
         /* Ensure background color covers the screen */
         box-sizing: border-box;
@@ -90,7 +92,7 @@
 
       #curveCanvas {
         width: 95%;
-        height: calc(100% - 100px);
+        height: calc(100% - 120px);
         /* Adjust height considering padding and buttons */
       }
 
@@ -101,8 +103,8 @@
         /* Adjust width */
         height: 20px;
         /* Adjust height */
-        margin: 0px;
-        /* Remove margin */
+        margin: 2px;
+        /* Reduce margin */
         font-size: 10px;
         /* Adjust font size */
         padding: 0;
@@ -127,18 +129,19 @@
         justify-content: center;
         gap: 10px;
         /* Add spacing between buttons */
-        margin-top: 10px;
+        margin-top: 5px;
+        /* Reduce margin */
       }
 
       #closeButton,
       #getCSVButton {
-        width: 50%;
+        width: 100px;
         /* Adjust width */
-        height: 20px;
+        height: 15px;
         /* Adjust height */
         font-size: 10px;
         /* Adjust font size */
-/*        padding-bottom: 5px;*/
+        padding-bottom: 0px;
         /* Adjust padding */
         border-radius: 5px;
         /* Adjust border radius */
@@ -383,20 +386,15 @@
     function drawCurve() {
       const ctx = document.getElementById('curveCanvas').getContext('2d');
 
-      console.log('Drawing curve with parameters:');
-      console.log('Parameter:', activeChartParameter);
-      console.log('Date:', activeChartDate);
-      console.log('School:', schoolSelection);
-      console.log('Top Button:', activeTopButtonId);
-      console.log('Bottom Button:', activeBottomButtonText);
-      console.log('%%%Top Option:', options.topOption);
-      console.log('###Room Name:', activeRoomName); // Log the room name      
-
       // Example data (replace with actual data based on selection)
       const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const data = [10, 20, 15, 25, 30, 35, 40, 45, 50, 55, 60, 65];
 
       const chartLabel = buttonIdToLabelMap[activeChartParameter] || 'Curve Data';
+
+      // Check screen size and set font size accordingly
+      const smallScreen = window.innerHeight < 550;
+      const fontSize = smallScreen ? 10 : 12;
 
       // Destroy the previous chart if it exists
       if (chart) {
@@ -419,10 +417,27 @@
           responsive: true,
           scales: {
             x: {
-              beginAtZero: true
+              ticks: {
+                font: {
+                  size: fontSize
+                }
+              }
             },
             y: {
-              beginAtZero: true
+              ticks: {
+                font: {
+                  size: fontSize
+                }
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                font: {
+                  size: fontSize
+                }
+              }
             }
           }
         }
@@ -459,7 +474,7 @@
         this.lat = lat;
         this.lng = lng;
         this.text = text;
-        this.number = number;
+        this.number = this.createMarkerNumber(number);
         this.icon = createColoredIcon(color, width, height, text);
         this.marker = L.marker([lat, lng], { icon: this.icon, zIndexOffset: 100 }).addTo(map);
         this.marker.bindPopup(`<b>${this.name}</b>`);
@@ -467,6 +482,13 @@
         this.marker.on('click', () => this.showCanvas4(name)); // Pass the room name
         this.marker.on('mouseover', () => this.showNumberPopup());
         this.marker.on('mouseout', () => this.hideNumberPopup());
+      }
+
+      createMarkerNumber(number) {
+        const markerNumber = document.createElement('div');
+        markerNumber.className = 'marker-number';
+        markerNumber.innerText = number;
+        return markerNumber;
       }
 
       updateColor(newColor) {
@@ -487,7 +509,7 @@
 
       showNumberPopup() {
         if (this.marker.options.opacity === 1) {
-          this.marker.bindPopup(`<b>${this.number}</b>`).openPopup();
+          this.marker.bindPopup(`<b>${this.number.innerText}</b>`).openPopup();
         }
       }
 
@@ -755,4 +777,3 @@
 </body>
 
 </html>
-
