@@ -51,7 +51,7 @@
       align-items: center;
     }
 
-    /* CSS for scaling down buttons */
+    /* CSS for scaling down buttons and adjusting layout */
     @media (max-height: 550px) {
       button.chart-parameter,
       button.chart-date {
@@ -89,7 +89,8 @@
       }
 
       #curveCanvas {
-        height: calc(100% - 60px);
+        width: 95%;
+        height: calc(100% - 100px);
         /* Adjust height considering padding and buttons */
       }
 
@@ -113,7 +114,22 @@
         justify-content: center;
       }
 
-      /* Adjust closeButton and getCSVButton */
+      .chart-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+        /* Add spacing between buttons */
+      }
+
+      #buttonContainer {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        /* Add spacing between buttons */
+        margin-top: 10px;
+      }
+
       #closeButton,
       #getCSVButton {
         width: 50%;
@@ -366,6 +382,15 @@
 
     function drawCurve() {
       const ctx = document.getElementById('curveCanvas').getContext('2d');
+
+      console.log('Drawing curve with parameters:');
+      console.log('Parameter:', activeChartParameter);
+      console.log('Date:', activeChartDate);
+      console.log('School:', schoolSelection);
+      console.log('Top Button:', activeTopButtonId);
+      console.log('Bottom Button:', activeBottomButtonText);
+      console.log('%%%Top Option:', options.topOption);
+      console.log('###Room Name:', activeRoomName); // Log the room name      
 
       // Example data (replace with actual data based on selection)
       const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -728,6 +753,6 @@
   </script>
   <script src="scriptfile.js"></script>
 </body>
-</html>
 
+</html>
 
