@@ -46,6 +46,20 @@
       align-items: center;
     }
 
+      @media (max-height: 900px) {
+        button.chart-parameter, button.chart-date {
+        width: 35px; /* Adjust width */
+        height: 35px; /* Adjust height */
+        font-size: 12px; /* Adjust font size */
+        padding: 0; /* Remove padding */
+        border-radius: 50%; /* Ensure buttons are circular */
+      }
+
+      .label {
+        font-size: 12px; /* Adjust font size */
+      }
+    }
+
     /* CSS for scaling down buttons */
     @media (max-height: 550px) {
       button.chart-parameter, button.chart-date {
