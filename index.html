@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="chart.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="rooms.js"></script>
   <style>
     /* Your CSS styles */
@@ -19,8 +21,10 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1001; /* Ensure overlay is above other elements */
+      z-index: 1001;
+      /* Ensure overlay is above other elements */
     }
+
     #canvasContainer4 {
       position: fixed;
       top: 50%;
@@ -31,7 +35,8 @@
       background-color: white;
       border: 1px solid #ccc;
       display: none;
-      z-index: 1002; /* Ensure canvasContainer4 is above the overlay */
+      z-index: 1002;
+      /* Ensure canvasContainer4 is above the overlay */
       overflow: hidden;
     }
 
@@ -45,19 +50,26 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     /* CSS for scaling down buttons */
     @media (max-height: 550px) {
-      button.chart-parameter, button.chart-date {
-        width: 30px; /* Adjust width */
-        height: 30px; /* Adjust height */
-        font-size: 10px; /* Adjust font size */
-        padding: 0; /* Remove padding */
-        border-radius: 50%; /* Ensure buttons are circular */
+      button.chart-parameter,
+      button.chart-date {
+        width: 30px;
+        /* Adjust width */
+        height: 30px;
+        /* Adjust height */
+        font-size: 10px;
+        /* Adjust font size */
+        padding: 0;
+        /* Remove padding */
+        border-radius: 50%;
+        /* Ensure buttons are circular */
       }
 
       .label {
-        font-size: 10px; /* Adjust font size */
+        font-size: 10px;
+        /* Adjust font size */
       }
 
       #canvasContainer4 {
@@ -67,30 +79,43 @@
         width: 95%;
         height: 100%;
         transform: translate(-50%, -50%);
-        padding: 10px; /* Optional padding */
-        background-color: white; /* Ensure background color covers the screen */
+        padding: 10px;
+        /* Optional padding */
+        background-color: white;
+        /* Ensure background color covers the screen */
         box-sizing: border-box;
-        z-index: 1002; /* Ensure it appears above other elements */
+        z-index: 1002;
+        /* Ensure it appears above other elements */
       }
 
       #curveCanvas {
-        height: calc(100% - 60px); /* Adjust height considering padding and buttons */
+        height: calc(100% - 60px);
+        /* Adjust height considering padding and buttons */
       }
-          /* Adjust buttons in topCanvas and bottomCanvas */
-    #topCanvas .buttonTop, #bottomCanvas .buttonBottom {
-        width: 20px; /* Adjust width */
-        height: 20px; /* Adjust height */
-        margin: 0px; /* Remove margin */
-        font-size: 10px; /* Adjust font size */
-        padding: 0; /* Remove padding */
-        border-radius: 50%; /* Ensure buttons are circular */
+
+      /* Adjust buttons in topCanvas and bottomCanvas */
+      #topCanvas .buttonTop,
+      #bottomCanvas .buttonBottom {
+        width: 20px;
+        /* Adjust width */
+        height: 20px;
+        /* Adjust height */
+        margin: 0px;
+        /* Remove margin */
+        font-size: 10px;
+        /* Adjust font size */
+        padding: 0;
+        /* Remove padding */
+        border-radius: 50%;
+        /* Ensure buttons are circular */
         display: flex;
         align-items: center;
         justify-content: center;
-    }
+      }
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <div id="topCanvas"></div>
@@ -197,12 +222,22 @@
       topOption: 'Ground',
       bottomOption: 'Dew Point'
     };
+    let chart;
+
+    const buttonIdToLabelMap = {
+      'button41': 'CO2 (ppm)',
+      'button42': 'PM2.5 (µg/m\u00B3)',
+      'button43': 'Dew Point (\u00B0F)',
+      'button44': 'TVOC (µg/m\u00B3)',
+      'button45': 'TEMP (\u00B0F)',
+      'button46': 'RH (%)'
+    };
 
     function activateButton(button, canvasId) {
       var canvasType = canvasId === 'topCanvas' ? 'topOption' : 'bottomOption';
 
       var buttons = document.querySelectorAll('#' + canvasId + ' .button, #' + canvasId + ' .buttonTop, #' + canvasId + ' .buttonBottom');
-      buttons.forEach(function(btn) {
+      buttons.forEach(function (btn) {
         btn.classList.remove('active');
         btn.style.backgroundColor = "white";
         btn.style.color = "black";
@@ -238,13 +273,13 @@
       topCanvas.innerHTML = '';
 
       var buttonNames = school === 1 ? ['Ground', 'First', 'Second'] : ['Floor1', 'Floor2'];
-      buttonNames.forEach(function(name, index) {
+      buttonNames.forEach(function (name, index) {
         var buttonContainer = document.createElement('div');
         buttonContainer.className = 'buttonContainer';
         var button = document.createElement('button');
         button.id = 'top' + (index + 1);
         button.className = 'buttonTop';
-        button.onclick = function() { activateButton(this, 'topCanvas'); };
+        button.onclick = function () { activateButton(this, 'topCanvas'); };
         var span = document.createElement('span');
         span.className = 'buttonText';
         span.textContent = name;
@@ -260,7 +295,7 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       function returnToInitialMapView() {
         console.log("Return button clicked");
         map.setView(initialMapCenter, initialMapZoom);
@@ -270,14 +305,14 @@
 
       // Add event listeners to parameter buttons
       document.querySelectorAll('.chart-parameter').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
           setActiveParameter(this);
         });
       });
 
       // Add event listeners to date buttons
       document.querySelectorAll('.chart-date').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
           setActiveDate(this);
         });
       });
@@ -311,46 +346,43 @@
     }
 
     function drawCurve() {
-      var canvas = document.getElementById('curveCanvas');
-      var ctx = canvas.getContext('2d');
-
-      // Set the canvas dimensions to match the element's size
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-
-      // Clear the canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Use activeChartParameter, activeChartDate, schoolSelection, activeTopButtonId, activeBottomButtonText, and activeRoomName
-      // to create data for the curve.
-      console.log('Drawing curve with parameters:');
-      console.log('Parameter:', activeChartParameter);
-      console.log('Date:', activeChartDate);
-      console.log('School:', schoolSelection);
-      console.log('Top Button:', activeTopButtonId);
-      console.log('Bottom Button:', activeBottomButtonText);
-      console.log('%%%Top Option:', options.topOption);
-      console.log('###Room Name:', activeRoomName); // Log the room name
+      const ctx = document.getElementById('curveCanvas').getContext('2d');
 
       // Example data (replace with actual data based on selection)
-      var data = [10, 20, 15, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
-      var maxDataValue = Math.max(...data);
+      const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const data = [10, 20, 15, 25, 30, 35, 40, 45, 50, 55, 60, 65];
 
-      // Set canvas drawing settings
-      ctx.strokeStyle = '#FF0000';
-      ctx.lineWidth = 2;
+      const chartLabel = buttonIdToLabelMap[activeChartParameter] || 'Curve Data';
 
-      // Calculate scaling factors
-      var xStep = canvas.width / (data.length - 1);
-      var yScale = canvas.height / maxDataValue;
-
-      // Draw the curve
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height - data[0] * yScale);
-      for (var i = 1; i < data.length; i++) {
-        ctx.lineTo(i * xStep, canvas.height - data[i] * yScale);
+      // Destroy the previous chart if it exists
+      if (chart) {
+        chart.destroy();
       }
-      ctx.stroke();
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: chartLabel,
+            data: data,
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 2,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              beginAtZero: true
+            },
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
     }
 
     function showCanvas4(roomName) {
@@ -370,7 +402,7 @@
 
     document.getElementById('closeButton').onclick = hideCanvas4;
 
-    document.getElementById('getCSVButton').onclick = function() {
+    document.getElementById('getCSVButton').onclick = function () {
       alert('Get CSV button clicked');
     };
 
@@ -431,13 +463,13 @@
     }
 
     function updateVisibleMarkers() {
-      var visibleMarkers = markerArray.filter(function(marker) {
+      var visibleMarkers = markerArray.filter(function (marker) {
         return map.getBounds().contains(marker.getLatLng());
       });
 
       console.log('Visible Markers:', visibleMarkers.map(marker => marker.options.name));
 
-      zoomLevel = (map.getZoom() ===  map.getMaxZoom());
+      zoomLevel = (map.getZoom() === map.getMaxZoom());
       const arrayLength = markerArray.length;
 
       if (zoomLevel) {
@@ -483,18 +515,18 @@
     }
 
     function clearRoomMarkers() {
-      roomMarkers.forEach(function(roomMarker) {
+      roomMarkers.forEach(function (roomMarker) {
         map.removeLayer(roomMarker.marker);
       });
       roomMarkers = [];
     }
 
     function updateMarkerColors(colorArray) {
-      var visibleMarkers = roomMarkers.filter(function(room) {
+      var visibleMarkers = roomMarkers.filter(function (room) {
         return room.marker.options.opacity === 1;
       });
 
-      visibleMarkers.forEach(function(room, index) {
+      visibleMarkers.forEach(function (room, index) {
         if (index < colorArray.length) {
           room.updateColor(colorArray[index]);
         }
@@ -513,10 +545,10 @@
     var manuMax = 19.5; // Replace this with your desired maximum zoom level for small viewports
 
     function setMaxZoom() {
-        var viewportHeight = window.innerHeight;
-        currentMaxZoom = viewportHeight < 550 ? manuMax : 20.5; // Update global variable
-        console.log("Maximum Zoom Level:", currentMaxZoom);
-        return currentMaxZoom;
+      var viewportHeight = window.innerHeight;
+      currentMaxZoom = viewportHeight < 550 ? manuMax : 20.5; // Update global variable
+      console.log("Maximum Zoom Level:", currentMaxZoom);
+      return currentMaxZoom;
     }
 
     function initMap() {
@@ -550,7 +582,7 @@
       marker1.bindPopup("<b>Chicago Jesuit Academy</b>");
       markerArray.push(marker1);
 
-      marker1.on('click', function(e) {
+      marker1.on('click', function (e) {
         var lng = e.latlng.lng;
         var lat = e.latlng.lat;
         onMarkerClick(lat, lng);
@@ -560,29 +592,29 @@
       marker2.bindPopup("<b>School 2</b>");
       markerArray.push(marker2);
 
-      marker2.on('click', function(e) {
+      marker2.on('click', function (e) {
         var lng = e.latlng.lng;
         var lat = e.latlng.lat;
         onMarkerClick(lat, lng);
       });
 
-      markerArray.forEach(function(marker) {
-        marker.on('mouseover', function() {
+      markerArray.forEach(function (marker) {
+        marker.on('mouseover', function () {
           if (this.options.opacity === 1) {
             this.openPopup();
           }
         });
 
-        marker.on('mouseout', function() {
+        marker.on('mouseout', function () {
           this.closePopup();
         });
       });
 
-      map.on('moveend', function() {
+      map.on('moveend', function () {
         updateVisibleMarkers();
       });
 
-      map.on('zoomend', function() {
+      map.on('zoomend', function () {
         updateVisibleMarkers();
       });
 
@@ -594,12 +626,12 @@
     }
 
     // Update maxZoom on window resize
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
       var newMaxZoom = setMaxZoom();
       map.setMaxZoom(newMaxZoom); // Update the map's maxZoom dynamically
 
       // Also update the tile layer's maxZoom
-      map.eachLayer(function(layer) {
+      map.eachLayer(function (layer) {
         if (layer instanceof L.TileLayer) {
           layer.options.maxZoom = newMaxZoom;
         }
@@ -623,14 +655,14 @@
       }
     }
 
-    document.getElementById('topCanvas').addEventListener('click', function(event) {
+    document.getElementById('topCanvas').addEventListener('click', function (event) {
       if (event.target && event.target.matches('.buttonTop')) {
         clearRoomMarkers();
         activateButton(event.target, 'topCanvas');
       }
     });
 
-    document.getElementById('bottomCanvas').addEventListener('click', function(event) {
+    document.getElementById('bottomCanvas').addEventListener('click', function (event) {
       if (event.target && event.target.matches('.buttonBottom')) {
         activateButton(event.target, 'bottomCanvas');
       }
@@ -661,29 +693,21 @@
 
     document.getElementById('closeButton').onclick = hideCanvas4;
 
-    document.getElementById('getCSVButton').onclick = function() {
+    document.getElementById('getCSVButton').onclick = function () {
       alert('Get CSV button clicked');
     };
 
     // Function to log current state
     function logCurrentState() {
       console.log("schoolSelection:", schoolSelection);
-//      console.log("activeTopButtonId:", activeTopButtonId);
-//      console.log("activeBottomButtonText:", activeBottomButtonText);
       console.log("activeChartParameter:", activeChartParameter);
       console.log("activeChartDate:", activeChartDate);
       console.log("options.topOption:", options.topOption);
       console.log("activeRoomName:", activeRoomName);
       console.log("currentMaxZoom:", currentMaxZoom); // Log the current maximum zoom level
     }
-
-    // Call the function every 10 seconds
-//    setInterval(logCurrentState, 10000);
-
   </script>
   <script src="scriptfile.js"></script>
 </body>
 </html>
-
-
 
