@@ -92,9 +92,10 @@
 
       #curveCanvas {
         width: 95%;
-        height: calc(100% - 150px);
+        height: calc(100% - 120px);
         /* Adjust height considering padding and buttons */
         margin-top: -10px;
+        margin-bottom: -5px;
       }
 
       /* Adjust buttons in topCanvas and bottomCanvas */
@@ -122,10 +123,10 @@
         flex-wrap: wrap;
         justify-content: center;
         gap: 2px;
-        margin-top: -10px;
+        margin-top: -5px;
         /* Add spacing between buttons */
       }
-      .top-buttons
+      .top-buttons{
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
@@ -144,9 +145,9 @@
 
       #closeButton,
       #getCSVButton {
-        width: 100px;
+        width: 80px;
         /* Adjust width */
-        height: 35px;
+        height: 15px;
         /* Adjust height */
         font-size: 10px;
         /* Adjust font size */
@@ -158,6 +159,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      margin-top: 150px;
       }
     }
   </style>
@@ -224,8 +226,8 @@
       </div>
     </div>
     <div id="buttonContainer">
-      <div id="closeButton">Return</div>
-      <div id="getCSVButton">CSV</div>
+      <div id="closeButton">Return to Map</div>
+      <div id="getCSVButton">Get CSV</div>
     </div>
   </div>
   <div id="bottomCanvas">
@@ -785,4 +787,3 @@
   <script src="scriptfile.js"></script>
 </body>
 </html>
-
