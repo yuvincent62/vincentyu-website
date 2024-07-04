@@ -395,12 +395,28 @@
 
     function drawCurve() {
       const ctx = document.getElementById('curveCanvas').getContext('2d');
+      let labels = [];
+      labels = ['05','10','15','20', '25', '30','35', '40', '45', '50', '55', '60'];
+     if(activeChartDate ==='day'){
+        labels = ['0:00','2:00','4:00','6:00', '8:00', '10:00','12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
+      }else if(activeChartDate ==='week'){
+        labels = ['Manday','Tuesday','Wednesday','Thrusday', 'Friday', 'Saturday','Sunday'];
+      }else if(activeChartDate ==='month'){
+        labels = ['00','05','10','15', '20', '25','30'];
+      }else if(activeChartDate ==='year'){
+        labels = labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      }
+
 
       // Example data (replace with actual data based on selection)
-      const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+//      const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const data = [10, 20, 15, 25, 30, 35, 40, 45, 50, 55, 60, 65];
 
       const chartLabel = buttonIdToLabelMap[activeChartParameter] || 'Curve Data';
+
+      console.log('####' + activeChartParameter);
+      console.log('####' + activeChartDate );
 
       // Check screen size and set font size accordingly
       const smallScreen = window.innerHeight < 550;
@@ -783,7 +799,7 @@
       console.log("activeRoomName:", activeRoomName);
       console.log("currentMaxZoom:", currentMaxZoom); // Log the current maximum zoom level
     }
-    setInterval(logCurrentState, 10000);
+//    setInterval(logCurrentState, 10000);
   </script>
   <script src="scriptfile.js"></script>
 </body>
