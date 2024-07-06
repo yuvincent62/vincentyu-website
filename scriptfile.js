@@ -7,60 +7,63 @@ var activeTopButtonId = 'top1';
 var activeBottomButtonText = 'Dew Point';
 var initialMapCenter = [43.0731, -89.4012];
 var initialMapZoom = 8;
-let maxZoom = 20.5;
-
+var activeChartParameter = 'CO2'; // Default active parameter
+var activeChartDate = 'hour'; // Default active date
+var activeRoomName = ''; // Default active room name
+var currentMaxZoom; // Global variable to hold current maximum zoom 
 var options = {
   topOption: 'Ground',
   bottomOption: 'Dew Point'
 };
 
-function activateButton(button, canvasId) {
-  var canvasType = canvasId === 'topCanvas' ? 'topOption' : 'bottomOption';
+    function activateButton(button, canvasId) {
+      var canvasType = canvasId === 'topCanvas' ? 'topOption' : 'bottomOption';
 
-  var buttons = document.querySelectorAll('#' + canvasId + ' .button, #' + canvasId + ' .buttonTop, #' + canvasId + ' .buttonBottom');
-  buttons.forEach(function(btn) {
-    btn.classList.remove('active');
-    btn.style.backgroundColor = "white";
-    btn.style.color = "black";
-  });
+      var buttons = document.querySelectorAll('#' + canvasId + ' .button, #' + canvasId + ' .buttonTop, #' + canvasId + ' .buttonBottom');
+      buttons.forEach(function (btn) {
+        btn.classList.remove('active');
+        btn.style.backgroundColor = "white";
+        btn.style.color = "black";
+      });
 
-  button.classList.add('active');
-  button.style.backgroundColor = "green";
-  button.style.color = "white";
+      button.classList.add('active');
+      button.style.backgroundColor = "green";
+      button.style.color = "white";
 
-  options[canvasType] = button.nextElementSibling.textContent.trim();
+      options[canvasType] = button.nextElementSibling.textContent.trim();
 
-  if (canvasId === 'topCanvas') {
-    activeTopButtonId = button.id;
-  } else if (canvasId === 'bottomCanvas') {
-    activeBottomButtonText = button.nextElementSibling.textContent.trim();
-  }
+      if (canvasId === 'topCanvas') {
+        activeTopButtonId = button.id;  // Update activeTopButtonId
+      } else if (canvasId === 'bottomCanvas') {
+        activeBottomButtonText = button.nextElementSibling.textContent.trim();  // Update activeBottomButtonText
+      }
 
-  onOptionChange(canvasType, options[canvasType]);
+      onOptionChange(canvasType, options[canvasType]);
 
-  const currentSchool = schoolSelection;
-  const currentFloor = options.topOption;
-  const currentParameter = activeBottomButtonText;
-  let colorArray = [];
-  zoomLevel = (map.getZoom() === currentMaxZoom);
-  if (zoomLevel) {
-    colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
-  }
-  updateMarkerColors(colorArray);
-}
+      const currentSchool = schoolSelection;
+      const currentFloor = options.topOption;
+      const currentParameter = activeBottomButtonText;
+      let colorArray = [];
+      zoomLevel = (map.getZoom() === 20.5);
+      if (zoomLevel) {
+        colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
+      }
+      updateMarkerColors(colorArray);
+    }
+
 
     function createTopCanvasButtons(school) {
       var topCanvas = document.getElementById('topCanvas');
       topCanvas.innerHTML = '';
 
       var buttonNames = school === 1 ? ['Ground', 'First', 'Second'] : ['Floor1', 'Floor2'];
-      buttonNames.forEach(function(name, index) {
+      buttonNames.forEach(function (name, index) {
         var buttonContainer = document.createElement('div');
         buttonContainer.className = 'buttonContainer';
         var button = document.createElement('button');
         button.id = 'top' + (index + 1);
         button.className = 'buttonTop';
-        button.onclick = function() { activateButton(this, 'topCanvas'); };
+        button.onclick = function () { activateButton(this, 'topCanvas'); };
         var span = document.createElement('span');
         span.className = 'buttonText';
         span.textContent = name;
@@ -366,5 +369,4 @@ function getColumn(array, i) {
     // Return the column array
     return column;
 }
-
 
