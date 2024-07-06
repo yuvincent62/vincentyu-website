@@ -1,3 +1,7 @@
+const smallScreen = window.innerHeight < 550;
+const fontSize = smallScreen ? 10 : 12;
+
+
 function drawCurve() {
   const ctx = document.getElementById('curveCanvas').getContext('2d');
   let labels = [];
@@ -13,18 +17,47 @@ function drawCurve() {
   }
 
   let data = [];
+  let options = {
+     responsive: true,
+     scales: {
+         y: {
+              beginAtZero: false
+          }
+      },
+      plugins: {
+          legend: {
+              labels: {
+                  font: {
+                      size: fontSize
+                  }
+              }
+          }
+      }
+  };
   if(activeChartParameter === 'button41'){
     data =[1020, 2000, 1500, 2500, 1030, 2035, 840, 1145, 1150, 955, 960, 965];
+    options.scales.y.suggestedMin = 900; 
+    options.scales.y.suggestedMax = 2100;
   } else if (activeChartParameter === 'button42') {
     data = [15, 15, 10, 8, 12, 18, 26, 20, 18, 14, 12, 8];
+    options.scales.y.suggestedMin = 18; 
+    options.scales.y.suggestedMax = 26;
   }else if (activeChartParameter === 'button43') {
     data = [40, 45, 50, 55, 65, 70, 65, 50, 45, 50, 55, 60];
+    options.scales.y.suggestedMin = 54;
+    options.scales.y.suggestedMax = 66;
   }else if (activeChartParameter === 'button44') {
-    data = [0.1, 0.5, 2, 4, 6, 8, 9, 11, 13, 10, 9,8];
+    data = [1.5, 1.8, 2, 4, 6, 8, 9, 11, 13, 10, 9,8];
+    options.scales.y.suggestedMin = 0; 
+    options.scales.y.suggestedMax = 11;;
   }else if (activeChartParameter === 'button45') {
     data = [45, 55, 60, 70, 85, 90, 95, 80, 75, 50, 55, 60];
+    options.scales.y.suggestedMin = 50; 
+    options.scales.y.suggestedMax = 95;
   }else if (activeChartParameter === 'button46') {
     data = [25, 35, 40, 50, 35, 60, 75, 85, 80, 70, 55, 60];
+    options.scales.y.suggestedMin = 15; 
+    options.scales.y.suggestedMax = 85;
   }
 
   const chartLabel = buttonIdToLabelMap[activeChartParameter] || 'Curve Data';
@@ -33,8 +66,8 @@ function drawCurve() {
   console.log('####' + activeChartDate );
 
   // Check screen size and set font size accordingly
-  const smallScreen = window.innerHeight < 550;
-  const fontSize = smallScreen ? 10 : 12;
+
+
 
   // Destroy the previous chart if it exists
   if (chart) {
@@ -166,34 +199,7 @@ function drawCurve() {
         fill: false
       }]
     },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          ticks: {
-            font: {
-              size: fontSize
-            }
-          }
-        },
-        y: {
-          ticks: {
-            font: {
-              size: fontSize
-            }
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          labels: {
-            font: {
-              size: fontSize
-            }
-          }
-        }
-      }
-    },
+    options: options,
     plugins: [horizontalLinePlugin]
   });
 }
