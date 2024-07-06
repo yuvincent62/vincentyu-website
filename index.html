@@ -10,158 +10,6 @@
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="rooms.js"></script>
-  <style>
-    /* Your CSS styles */
-    #overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1001; 
-      /* Ensure overlay is above other elements */
-    }
-    #canvasContainer4 {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 50%;
-      height: 100%;
-      transform: translate(-50%, -50%);
-      background-color: white;
-      border: 1px solid #ccc;
-      display: none;
-      z-index: 1002;
-    /* Ensure canvasContainer4 is above the overlay */
-      overflow: hidden;
-    }
-
-    #canvas4 {
-      width: 100%;
-      height: calc(100% - 80px);
-      background-color: white;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* CSS for scaling down buttons and adjusting layout */
-    @media (max-height: 550px) {
-      button.chart-parameter,
-      button.chart-date {
-        width: 10px;
-        /* Adjust width */
-        height: 10px;
-        /* Adjust height */
-        font-size: 10px;
-        /* Adjust font size */
-        padding-bottom: 0px;
-        /* Remove padding */
-        border-radius: 50%;
-        /* Ensure buttons are circular */
-        margin-top: 10px;
-        /* Reduce margin */
-      }
-
-      .label {
-        font-size: 10px;
-        /* Adjust font size */
-      }
-
-      #canvasContainer4 {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        width: 95%;
-        height: 100%;
-        transform: translate(-50%, -50%);
-        padding: 0px;
-        /* Reduce padding */
-        background-color: white;
-        /* Ensure background color covers the screen */
-        box-sizing: border-box;
-        z-index: 1002;
-        /* Ensure it appears above other elements */
-      }
-
-      #curveCanvas {
-        width: 95%;
-        height: calc(100% - 80px);
-        /* Adjust height considering padding and buttons */
-        margin-top: -10px;
-        margin-bottom: -5px;
-      }
-
-      /* Adjust buttons in topCanvas and bottomCanvas */
-      #topCanvas .buttonTop,
-      #bottomCanvas .buttonBottom {
-        width: 15px;
-        /* Adjust width */
-        height: 15px;
-        /* Adjust height */
-        margin-top: -10px;
-        /* Reduce margin */
-        font-size: 10px;
-        /* Adjust font size */
-        padding: 0;
-        /* Remove padding */
-        border-radius: 50%;
-        /* Ensure buttons are circular */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .chart-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 2px;
-        margin-top: -10px;
-        /* Add spacing between buttons */
-      }
-      .top-buttons{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 2px;
-        margin-top: -10px;
-      }
-
-      #buttonContainer {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        /* Add spacing between buttons */
-        margin-top: 0px;
-        /* Reduce margin */
-      }
-
-      #closeButton,
-      #getCSVButton {
-        width: 50%;
-        /* Adjust width */
-        height: 20px;
-        /* Adjust height */
-        font-size: 10px;
-        /* Adjust font size */
-        padding-bottom: 0px;
-        /* Adjust padding */
-/*        border-radius: 5px;*/
-        /* Adjust border radius */
-        display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      margin-top: 250px;
-      }
-    }
-
-  </style>
 </head>
 
 <body>
@@ -252,26 +100,7 @@
   <div id="overlay"></div>
 
   <script>
-    // Global variables
-    var zoomLevel = false;
-    var schoolSelection = null;
-    var map;
-    var markerArray = [];
-    var roomMarkers = [];
-    var activeTopButtonId = 'top1';
-    var activeBottomButtonText = 'Dew Point';
-    var initialMapCenter = [43.0731, -89.4012];
-    var initialMapZoom = 8;
-    var activeChartParameter = 'CO2'; // Default active parameter
-    var activeChartDate = 'hour'; // Default active date
-    var activeRoomName = ''; // Default active room name
-    var currentMaxZoom; // Global variable to hold current maximum zoom 
-    var options = {
-      topOption: 'Ground',
-      bottomOption: 'Dew Point'
-    };
     let chart;
-
     const buttonIdToLabelMap = {
       'button41': 'CO2 (ppm)',
       'button42': 'PM2.5 (µg/m\u00B3)',
@@ -280,68 +109,6 @@
       'button45': 'TEMP (\u00B0F)',
       'button46': 'RH (%)'
     };
-
-    function activateButton(button, canvasId) {
-      var canvasType = canvasId === 'topCanvas' ? 'topOption' : 'bottomOption';
-
-      var buttons = document.querySelectorAll('#' + canvasId + ' .button, #' + canvasId + ' .buttonTop, #' + canvasId + ' .buttonBottom');
-      buttons.forEach(function (btn) {
-        btn.classList.remove('active');
-        btn.style.backgroundColor = "white";
-        btn.style.color = "black";
-      });
-
-      button.classList.add('active');
-      button.style.backgroundColor = "green";
-      button.style.color = "white";
-
-      options[canvasType] = button.nextElementSibling.textContent.trim();
-
-      if (canvasId === 'topCanvas') {
-        activeTopButtonId = button.id;  // Update activeTopButtonId
-      } else if (canvasId === 'bottomCanvas') {
-        activeBottomButtonText = button.nextElementSibling.textContent.trim();  // Update activeBottomButtonText
-      }
-
-      onOptionChange(canvasType, options[canvasType]);
-
-      const currentSchool = schoolSelection;
-      const currentFloor = options.topOption;
-      const currentParameter = activeBottomButtonText;
-      let colorArray = [];
-      zoomLevel = (map.getZoom() === 20.5);
-      if (zoomLevel) {
-        colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
-      }
-      updateMarkerColors(colorArray);
-    }
-
-    function createTopCanvasButtons(school) {
-      var topCanvas = document.getElementById('topCanvas');
-      topCanvas.innerHTML = '';
-
-      var buttonNames = school === 1 ? ['Ground', 'First', 'Second'] : ['Floor1', 'Floor2'];
-      buttonNames.forEach(function (name, index) {
-        var buttonContainer = document.createElement('div');
-        buttonContainer.className = 'buttonContainer';
-        var button = document.createElement('button');
-        button.id = 'top' + (index + 1);
-        button.className = 'buttonTop';
-        button.onclick = function () { activateButton(this, 'topCanvas'); };
-        var span = document.createElement('span');
-        span.className = 'buttonText';
-        span.textContent = name;
-        buttonContainer.appendChild(button);
-        buttonContainer.appendChild(span);
-        topCanvas.appendChild(buttonContainer);
-      });
-
-      // Ensure the first button is active
-      var firstButton = topCanvas.querySelector('.buttonTop');
-      if (firstButton) {
-        activateButton(firstButton, 'topCanvas');
-      }
-    }
 
     document.addEventListener('DOMContentLoaded', function () {
       function returnToInitialMapView() {
@@ -393,209 +160,6 @@
       drawCurve();
     }
 
-    function drawCurve() {
-  const ctx = document.getElementById('curveCanvas').getContext('2d');
-  let labels = [];
-  labels = ['05','10','15','20', '25', '30','35', '40', '45', '50', '55', '60'];
-  if(activeChartDate === 'day'){
-    labels = ['0:00','2:00','4:00','6:00', '8:00', '10:00','12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
-  }else if(activeChartDate === 'week'){
-    labels = ['Monday','Tuesday','Wednesday','Thursday', 'Friday', 'Saturday','Sunday'];
-  }else if(activeChartDate === 'month'){
-    labels = ['00','05','10','15', '20', '25','30'];
-  }else if(activeChartDate === 'year'){
-    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  }
-  
-  let data = [];
-  if(activeChartParameter === 'button41'){
-    data =[1020, 2000, 1500, 2500, 1030, 2035, 840, 1145, 1150, 955, 960, 965];
-  } else if (activeChartParameter === 'button42') {
-    data = [15, 15, 10, 8, 12, 18, 26, 20, 18, 14, 12, 8];
-  }else if (activeChartParameter === 'button43') {
-    data = [40, 45, 50, 55, 65, 70, 65, 50, 45, 50, 55, 60];
-  }else if (activeChartParameter === 'button44') {
-    data = [0.1, 0.5, 2, 4, 6, 8, 9, 11, 13, 10, 9,8];
-  }else if (activeChartParameter === 'button45') {
-    data = [45, 55, 60, 70, 85, 90, 95, 80, 75, 50, 55, 60];
-  }else if (activeChartParameter === 'button46') {
-    data = [25, 35, 40, 50, 35, 60, 75, 85, 80, 70, 55, 60];
-  }
-  
-  const chartLabel = buttonIdToLabelMap[activeChartParameter] || 'Curve Data';
-
-  console.log('####' + activeChartParameter);
-  console.log('####' + activeChartDate );
-
-  // Check screen size and set font size accordingly
-  const smallScreen = window.innerHeight < 550;
-  const fontSize = smallScreen ? 10 : 12;
-
-  // Destroy the previous chart if it exists
-  if (chart) {
-    chart.destroy();
-  }
-
-  const horizontalLinePlugin = {
-    id: 'horizontalLine',
-    afterDraw: (chart) => {
-      const yScale = chart.scales.y;
-      const ctx = chart.ctx;
-      if (activeChartParameter === 'button41') {
-        const yValues = [1000, 2000]; // Set the y-values for the horizontal lines for button41
-        const colors = ['yellow', 'red']; // Colors for the lines for button41
-        yValues.forEach((yValue, index) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chart.chartArea.left, yScale.getPixelForValue(yValue));
-          ctx.lineTo(chart.chartArea.right, yScale.getPixelForValue(yValue));
-          ctx.strokeStyle = colors[index];
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-        });
-      } else if (activeChartParameter === 'button42') {
-        const yValues = [19,25]; // Set the y-values for the horizontal lines for button42
-        const colors = ['yellow', 'red']; // Colors for the lines for button42
-        yValues.forEach((yValue, index) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chart.chartArea.left, yScale.getPixelForValue(yValue));
-          ctx.lineTo(chart.chartArea.right, yScale.getPixelForValue(yValue));
-          ctx.strokeStyle = colors[index];
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-        });
-      } else if (activeChartParameter === 'button43') {
-        const yValues = [55, 65]; // Set the y-values for the horizontal lines for button42
-        const colors = ['yellow', 'red'] // Colors for the lines for button42
-        yValues.forEach((yValue, index) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chart.chartArea.left, yScale.getPixelForValue(yValue));
-          ctx.lineTo(chart.chartArea.right, yScale.getPixelForValue(yValue));
-          ctx.strokeStyle = colors[index];
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-        });
-      }else if (activeChartParameter === 'button44') {
-        const yValues = [1,10]; // Set the y-values for the horizontal lines for button42
-        const colors = ['yellow', 'red']; // Colors for the lines for button42
-        yValues.forEach((yValue, index) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chart.chartArea.left, yScale.getPixelForValue(yValue));
-          ctx.lineTo(chart.chartArea.right, yScale.getPixelForValue(yValue));
-          ctx.strokeStyle = colors[index];
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-        });
-      }else if (activeChartParameter === 'button45') {
-        const yValues = [55,65,81,90]; // Set the y-values for the horizontal lines for button42
-        const colors = ['red', 'yellow', 'yellow', 'red']; // Colors for the lines for button42
-        yValues.forEach((yValue, index) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chart.chartArea.left, yScale.getPixelForValue(yValue));
-          ctx.lineTo(chart.chartArea.right, yScale.getPixelForValue(yValue));
-          ctx.strokeStyle = colors[index];
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-        });
-      }else if (activeChartParameter === 'button46') {
-        const yValues = [20, 30, 60, 80]; // Set the y-values for the horizontal lines for button42
-        const colors = ['red', 'yellow', 'yellow', 'red']; // Colors for the lines for button42
-        yValues.forEach((yValue, index) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chart.chartArea.left, yScale.getPixelForValue(yValue));
-          ctx.lineTo(chart.chartArea.right, yScale.getPixelForValue(yValue));
-          ctx.strokeStyle = colors[index];
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-        });
-      }else if (activeChartParameter === 'button45') {
-        const yValues = [10, 30, 50]; // Set the y-values for the horizontal lines for button42
-        const colors = ['rgba(128, 0, 128, 0.5)', 'rgba(0, 128, 128, 0.5)', 'rgba(128, 128, 0, 0.5)']; // Colors for the lines for button42
-        yValues.forEach((yValue, index) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chart.chartArea.left, yScale.getPixelForValue(yValue));
-          ctx.lineTo(chart.chartArea.right, yScale.getPixelForValue(yValue));
-          ctx.strokeStyle = colors[index];
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-        });
-      } else if (activeChartParameter === 'button46') {
-        const yValues = [10, 30, 50]; // Set the y-values for the horizontal lines for button42
-        const colors = ['rgba(128, 0, 128, 0.5)', 'rgba(0, 128, 128, 0.5)', 'rgba(128, 128, 0, 0.5)']; // Colors for the lines for button42
-        yValues.forEach((yValue, index) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chart.chartArea.left, yScale.getPixelForValue(yValue));
-          ctx.lineTo(chart.chartArea.right, yScale.getPixelForValue(yValue));
-          ctx.strokeStyle = colors[index];
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-        });
-      }
-    }
-  };
-
-  chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: chartLabel,
-        data: data,
-        borderColor: 'green',
-        borderWidth: 2,
-        fill: false
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          ticks: {
-            font: {
-              size: fontSize
-            }
-          }
-        },
-        y: {
-          ticks: {
-            font: {
-              size: fontSize
-            }
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          labels: {
-            font: {
-              size: fontSize
-            }
-          }
-        }
-      }
-    },
-    plugins: [horizontalLinePlugin]
-  });
-}
-
-
-
-
     function showCanvas4(roomName) {
       activeRoomName = roomName; // Set the active room name
       document.getElementById('canvasContainer4').style.display = 'block';
@@ -612,10 +176,6 @@
     }
 
     document.getElementById('closeButton').onclick = hideCanvas4;
-
-    document.getElementById('getCSVButton').onclick = function () {
-      alert('Get CSV button clicked');
-    };
 
     class classSensor {
       constructor(name, color, width, height, lat, lng, text, number) {
@@ -911,23 +471,39 @@
 
     document.getElementById('closeButton').onclick = hideCanvas4;
 
-    document.getElementById('getCSVButton').onclick = function () {
-      alert('Get CSV button clicked');
-    };
+    document.getElementById('getCSVButton').addEventListener('click', generateAndDownloadCSV);
+ 
 
-    // Function to log current state
-    function logCurrentState() {
-      console.log("schoolSelection:", schoolSelection);
-      console.log("!!!!activeChartParameter:", activeChartParameter);
-      console.log("!!!!activeChartDate:", activeChartDate);
-      console.log("activeChartDate:", activeChartDate);
-      console.log("options.topOption:", options.topOption);
-      console.log("activeRoomName:", activeRoomName);
-      console.log("currentMaxZoom:", currentMaxZoom); // Log the current maximum zoom level
-    }
+    function generateAndDownloadCSV() {
+            // Define your data
+            const data = array13;
+            // Convert data array to CSV string
+            const csvContent = data.map(e => e.join(",")).join("\n");
+
+            // Create a blob from the CSV string
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+            // Create a link element
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                // Create a URL for the blob and set it as the href attribute
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "data.csv");
+                
+                // Append link to the body and trigger the download
+                document.body.appendChild(link);
+                link.click();
+                
+                // Clean up and remove the link
+                document.body.removeChild(link);
+            }
+        }
   </script>
   <script src="scriptfile.js"></script>
+  <script src="curve.js"></script>
 </body>
 </html>
+
 
 
