@@ -1,26 +1,3 @@
-#canvasContainer4 {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 50%;
-  height: 70%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  border: 1px solid #ccc;
-  display: none;
-  z-index: 1000;
-  overflow: hidden;
-}
-#canvas4 {
-  width: 100%;
-  height: calc(100% - 40px);
-  background-color: white;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-}
 .top-buttons, .chart-buttons {
   display: flex;
   justify-content: space-around;
@@ -78,3 +55,153 @@
   border: 1px solid #000000;
   margin: 0 50px; /* Increase margin to 10px on both sides */
 }
+
+   /* Your CSS styles */
+   #overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001; 
+    /* Ensure overlay is above other elements */
+  }
+  #canvasContainer4 {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    display: none;
+    z-index: 1002;
+  /* Ensure canvasContainer4 is above the overlay */
+    overflow: hidden;
+  }
+
+  #canvas4 {
+    width: 100%;
+    height: calc(100% - 80px);
+    background-color: white;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* CSS for scaling down buttons and adjusting layout */
+  @media (max-height: 550px) {
+    button.chart-parameter,
+    button.chart-date {
+      width: 10px;
+      /* Adjust width */
+      height: 10px;
+      /* Adjust height */
+      font-size: 10px;
+      /* Adjust font size */
+      padding-bottom: 0px;
+      /* Remove padding */
+      border-radius: 50%;
+      /* Ensure buttons are circular */
+      margin-top: 10px;
+      /* Reduce margin */
+    }
+
+    .label {
+      font-size: 10px;
+      /* Adjust font size */
+    }
+
+    #canvasContainer4 {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 95%;
+      height: 100%;
+      transform: translate(-50%, -50%);
+      padding: 0px;
+      /* Reduce padding */
+      background-color: white;
+      /* Ensure background color covers the screen */
+      box-sizing: border-box;
+      z-index: 1002;
+      /* Ensure it appears above other elements */
+    }
+
+    #curveCanvas {
+      width: 95%;
+      height: calc(100% - 80px);
+      /* Adjust height considering padding and buttons */
+      margin-top: -10px;
+      margin-bottom: -5px;
+    }
+
+    /* Adjust buttons in topCanvas and bottomCanvas */
+    #topCanvas .buttonTop,
+    #bottomCanvas .buttonBottom {
+      width: 15px;
+      /* Adjust width */
+      height: 15px;
+      /* Adjust height */
+      margin-top: -10px;
+      /* Reduce margin */
+      font-size: 10px;
+      /* Adjust font size */
+      padding: 0;
+      /* Remove padding */
+      border-radius: 50%;
+      /* Ensure buttons are circular */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chart-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2px;
+      margin-top: -10px;
+      /* Add spacing between buttons */
+    }
+    .top-buttons{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2px;
+      margin-top: -10px;
+    }
+
+    #buttonContainer {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      /* Add spacing between buttons */
+      margin-top: 0px;
+      /* Reduce margin */
+    }
+
+    #closeButton,
+    #getCSVButton {
+      width: 50%;
+      /* Adjust width */
+      height: 20px;
+      /* Adjust height */
+      font-size: 10px;
+      /* Adjust font size */
+      padding-bottom: 0px;
+      /* Adjust padding */
+/*        border-radius: 5px;*/
+      /* Adjust border radius */
+      display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 250px;
+    }
+  }
