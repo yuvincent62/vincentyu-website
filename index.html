@@ -160,23 +160,6 @@
       drawCurve();
     }
 
-    function showCanvas4(roomName) {
-      activeRoomName = roomName; // Set the active room name
-      document.getElementById('canvasContainer4').style.display = 'block';
-      document.getElementById('overlay').style.display = 'block';
-
-      // Trigger clicks on button41 and Hour
-      document.getElementById('button41').click();
-      document.getElementById('hour').click();
-    }
-
-    function hideCanvas4() {
-      document.getElementById('canvasContainer4').style.display = 'none';
-      document.getElementById('overlay').style.display = 'none';
-    }
-
-    document.getElementById('closeButton').onclick = hideCanvas4;
-
     class classSensor {
       constructor(name, color, width, height, lat, lng, text, number) {
         this.name = name;
@@ -215,8 +198,8 @@
         document.getElementById('overlay').style.display = 'block';
 
         // Trigger clicks on button41 and Hour
-        document.getElementById('button41').click();
-        document.getElementById('hour').click();
+        document.getElementById('button43').click();
+        document.getElementById('day').click();
       }
 
       showNumberPopup() {
@@ -504,6 +487,8 @@
   <script src="curve.js"></script>
 </body>
 </html>
+
+
 
 
 
