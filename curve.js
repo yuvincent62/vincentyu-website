@@ -194,7 +194,7 @@ function drawCurve() {
       datasets: [{
         label: chartLabel,
         data: data,
-        borderColor: 'green',
+        borderColor: 'blue',
         borderWidth: 2,
         fill: false
       }]
