@@ -17,8 +17,8 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
   } else if (parameter === 'Dew Point') {
       prefix = 'Dew Point: ';
       suffix = '\u00B0F';
-  } else if (parameter === 'TVOC: ') {
-      prefix = 'TVOC';
+  } else if (parameter === 'TVOC') {
+      prefix = 'TVOC: ';
       suffix = 'µg/m\u00B3';
   } else if (parameter === 'Relative Humidity') {
       prefix = 'RH: ';
