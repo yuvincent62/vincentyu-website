@@ -95,7 +95,7 @@
   }
 
   /* CSS for scaling down buttons and adjusting layout */
-  @media (max-height: 550px) {
+  @media (max-height: 600px) {
     button.chart-parameter,
     button.chart-date {
       width: 10px;
