@@ -48,7 +48,7 @@ function drawCurve() {
   console.log('####' + activeChartDate);
 
   // Check screen size and set font size accordingly
-  const smallScreen = window.innerHeight < 550;
+  const smallScreen = window.innerHeight < 600;
   const fontSize = smallScreen ? 10 : 12;
 
   // Destroy the previous chart if it exists
