@@ -26,6 +26,8 @@
       display: flex;
       justify-content: center;
       gap: 10px; /* Space between buttons */
+      width: 80%;
+      height: 30px;
     }
     /* Style for bottom left canvas */
     #bottomCanvas {
