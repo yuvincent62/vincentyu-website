@@ -114,13 +114,13 @@
 
 #bottomCanvas {
   flex-direction: column;
-  background-color: transparent;
+  background-color: white;
 }
 
 #topCanvas, #returnCanvas {
   position: absolute;
   top: 10px;
-  background-color: transparent;
+  background-color: white;
   padding: 10px;
   border-radius: 10px;
   z-index: 1000;
