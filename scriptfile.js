@@ -11,6 +11,7 @@ var activeChartParameter = 'CO2'; // Default active parameter
 var activeChartDate = 'hour'; // Default active date
 var activeRoomName = ''; // Default active room name
 var currentMaxZoom; // Global variable to hold current maximum zoom 
+var needTop = true;
 var options = {
   topOption: 'Ground',
   bottomOption: 'Dew Point'
@@ -44,7 +45,7 @@ var options = {
       const currentFloor = options.topOption;
       const currentParameter = activeBottomButtonText;
       let colorArray = [];
-      zoomLevel = (map.getZoom() === 20.5);
+      zoomLevel = (map.getZoom()>15);    
       if (zoomLevel) {
         colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
       }
@@ -52,30 +53,39 @@ var options = {
     }
 
 
+
+
     function createTopCanvasButtons(school) {
       var topCanvas = document.getElementById('topCanvas');
       topCanvas.innerHTML = '';
-
-      var buttonNames = school === 1 ? ['Ground', 'First', 'Second'] : ['Floor1', 'Floor2'];
-      buttonNames.forEach(function (name, index) {
-        var buttonContainer = document.createElement('div');
-        buttonContainer.className = 'buttonContainer';
-        var button = document.createElement('button');
-        button.id = 'top' + (index + 1);
-        button.className = 'buttonTop';
-        button.onclick = function () { activateButton(this, 'topCanvas'); };
-        var span = document.createElement('span');
-        span.className = 'buttonText';
-        span.textContent = name;
-        buttonContainer.appendChild(button);
-        buttonContainer.appendChild(span);
-        topCanvas.appendChild(buttonContainer);
-      });
-
-      // Ensure the first button is active
-      var firstButton = topCanvas.querySelector('.buttonTop');
-      if (firstButton) {
-        activateButton(firstButton, 'topCanvas');
+    
+      var buttonNames;
+      if (school === 1) {
+        buttonNames = ['Ground', 'First', 'Second'];
+      } else if(school === 2){
+        buttonNames = ['Floor1', 'Floor2'];
+      } else if(school === 3){
+          buttonNames = ['null'];
+      }
+      if ( buttonNames!='null'){
+        buttonNames.forEach(function (name, index) {
+          var buttonContainer = document.createElement('div');
+          buttonContainer.className = 'buttonContainer';
+          var button = document.createElement('button');
+          button.id = 'top' + (index + 1);
+          button.className = 'buttonTop';
+          button.onclick = function () { activateButton(this, 'topCanvas'); };
+          var span = document.createElement('span');
+          span.className = 'buttonText';
+          span.textContent = name;
+          buttonContainer.appendChild(button);
+          buttonContainer.appendChild(span);
+          topCanvas.appendChild(buttonContainer);
+        });
+        var firstButton = topCanvas.querySelector('.buttonTop');
+        if (firstButton) {
+          activateButton(firstButton, 'topCanvas');
+        }
       }
     }
 
@@ -141,42 +151,6 @@ var options = {
         });
       }
 
-      function createColoredIcon(color, width, height, text) {
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = color;
-      ctx.fillRect(0, 0, width, height);
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = 'black';
-      ctx.strokeRect(0, 0, width, height);
-
-      ctx.font = '16px Arial';
-      ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      ctx.fillText(text, width / 2, height / 2);
-
-      return L.icon({
-        iconUrl: canvas.toDataURL(),
-        iconSize: [width, height],
-        iconAnchor: [width / 2, height / 2]
-      });
-    }
-
-
-
-
-
-
-
-
-
-
-
 //generate data
 // Function to generate a random number within a specified range
 function getRandomNumber(min, max) {
@@ -221,6 +195,7 @@ const array12 = generateSensorArrays(9);
 const array13 = generateSensorArrays(7);
 const array21 = generateSensorArrays(2);
 const array22 = generateSensorArrays(2);
+const array31 = generateSensorArrays(10);
 
 function SetColorArray(school, floor, airQuality){
   let colorAy=[];
@@ -239,7 +214,9 @@ function SetColorArray(school, floor, airQuality){
     }else if(floor==='Floor2'){
       currentFloorData=array22;
     }
-  } 
+  } else if(school===3){
+    currentFloorData=array31;
+  }
   if (airQuality=='CO2'){
     currentParameterData = getColumn(currentFloorData, 0);
   } 
@@ -285,7 +262,9 @@ function SetValueArray(school, floor, airQuality){
     }else if(floor==='Floor2'){
       currentFloorData=array22;
     }
-  } 
+  } else if(school===3){
+    currentFloorData=array31;
+  }
   if (airQuality=='CO2'){
     currentParameterData = getColumn(currentFloorData, 0);
   } 
