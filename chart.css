@@ -1,3 +1,5 @@
+
+
 .top-buttons, .chart-buttons {
   display: flex;
   justify-content: space-around;
@@ -95,7 +97,7 @@
   }
 
   /* CSS for scaling down buttons and adjusting layout */
-  @media (max-height: 600px) {
+  @media (max-height: 550px) {
     button.chart-parameter,
     button.chart-date {
       width: 10px;
@@ -203,5 +205,20 @@
     justify-content: center;
     text-align: center;
     margin-top: 250px;
+    }
+
+    .explanation {
+      padding: 5px;
+      font-size: 8px;
+    }
+    .legend {
+      font-size: 8px;
+    }
+    .legend h4 {
+      font-size: 8px;
+    }
+    .legend span {
+      width: 5px;
+      height: 5px;
     }
   }
