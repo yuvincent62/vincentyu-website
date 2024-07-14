@@ -11,10 +11,85 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
   <script src="rooms.js"></script>
+
+  <style>
+    /* Ensure map container takes up the full viewport height */
+    #map {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* Align the layer control icon next to the zoom control icon */
+    .leaflet-top .leaflet-control {
+      margin-top: 10px;
+    }
+
+    .leaflet-left .leaflet-control-layers {
+      margin-left: 5px; /* Adjust this value to position correctly next to zoom controls */
+    }
+
+    .explanation {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+      z-index: 1000; /* Ensure the explanation is above the map */
+      display: inline-block;
+      max-width: 300px;
+    }
+
+    .legend {
+      background: white;
+      padding: 5px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      font-size: 14px;
+      line-height: 1.4em;
+      color: #555;
+    }
+    .legend h4 {
+      margin: 0;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .legend div {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+    .legend span {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+
+    @media (max-height: 550px) {
+      .explanation {
+        padding: 5px;
+        font-size: 8px;
+      }
+      .legend {
+        font-size: 8px;
+      }
+      .legend h4 {
+        font-size: 8px;
+      }
+      .legend span {
+        width: 5px;
+        height: 5px;
+      }
+    }
+  </style>
 </head>
 
 <body>
   <div id="map"></div>
+  <div class="explanation" id="explanation">Explanation goes here</div> <!-- Explanation overlay -->
+
   <div id="topCanvas"></div>
   <div id="returnCanvas">
     <div class="buttonContainer">
@@ -100,6 +175,9 @@
   </div>
   <div id="overlay"></div>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+
   <script>
     let chart;
     const buttonIdToLabelMap = {
@@ -110,36 +188,6 @@
       'button45': 'TEMP (\u00B0F)',
       'button46': 'RH (%)'
     };
-
-    document.addEventListener('DOMContentLoaded', function () {
-      function returnToInitialMapView() {
-        console.log("Return button clicked");
-        map.setView(initialMapCenter, initialMapZoom);
-      }
-
-      document.getElementById('returnButton').addEventListener('click', returnToInitialMapView);
-
-      // Add event listeners to parameter buttons
-      document.querySelectorAll('.chart-parameter').forEach(button => {
-        button.addEventListener('click', function () {
-          setActiveParameter(this);
-        });
-      });
-
-      // Add event listeners to date buttons
-      document.querySelectorAll('.chart-date').forEach(button => {
-        button.addEventListener('click', function () {
-          setActiveDate(this);
-        });
-      });
-
-      // Set initial active buttons
-      document.getElementById('button41').classList.add('active');
-      document.getElementById('hour').classList.add('active');
-
-      // Initial draw
-      drawCurve();
-    });
 
     function setActiveParameter(button) {
       document.querySelectorAll('.chart-parameter').forEach(btn => {
@@ -161,69 +209,6 @@
       drawCurve();
     }
 
-    class classSensor {
-      constructor(name, color, width, height, lat, lng, text, number) {
-        this.name = name;
-        this.color = color;
-        this.width = width;
-        this.height = height;
-        this.lat = lat;
-        this.lng = lng;
-        this.text = text;
-        this.number = this.createMarkerNumber(number);
-        this.icon = createColoredIcon(color, width, height, text);
-        this.marker = L.marker([lat, lng], { icon: this.icon, zIndexOffset: 100 }).addTo(map);
-        this.marker.bindPopup(`<b>${this.name}</b>`);
-        this.showCanvas4 = this.showCanvas4.bind(this);
-        this.marker.on('click', () => this.showCanvas4(name)); // Pass the room name
-        this.marker.on('mouseover', () => this.showNumberPopup());
-        this.marker.on('mouseout', () => this.hideNumberPopup());
-      }
-
-      createMarkerNumber(number) {
-        const markerNumber = document.createElement('div');
-        markerNumber.className = 'marker-number';
-        markerNumber.innerText = number;
-        return markerNumber;
-      }
-
-      updateColor(newColor) {
-        this.color = newColor;
-        this.icon = createColoredIcon(this.color, this.width, this.height, this.text);
-        this.marker.setIcon(this.icon);
-      }
-
-      showCanvas4(roomName) {
-        activeRoomName = roomName; // Set the active room name
-        document.getElementById('canvasContainer4').style.display = 'block';
-        document.getElementById('overlay').style.display = 'block';
-
-        // Trigger clicks on button41 and Hour
-        document.getElementById('button43').click();
-        document.getElementById('day').click();
-      }
-
-      showNumberPopup() {
-        if (this.marker.options.opacity === 1) {
-          this.marker.bindPopup(`<b>${this.number.innerText}</b>`).openPopup();
-        }
-      }
-
-      hideNumberPopup() {
-        this.marker.closePopup();
-      }
-
-      hideMarker() {
-        this.marker.setOpacity(0);
-        this.marker.unbindPopup();
-      }
-
-      showMarker() {
-        this.marker.setOpacity(1);
-        this.marker.bindPopup(`<b>${this.name}</b>`);
-      }
-    }
-
     function updateVisibleMarkers() {
       var visibleMarkers = markerArray.filter(function (marker) {
         return map.getBounds().contains(marker.getLatLng());
@@ -231,12 +216,25 @@
 
       console.log('Visible Markers:', visibleMarkers.map(marker => marker.options.name));
 
-      zoomLevel = (map.getZoom() === map.getMaxZoom());
+      var zoomLevel = map.getZoom() >= 18;
       const arrayLength = markerArray.length;
 
       if (zoomLevel) {
-        const schoolPass = visibleMarkers.length === 1 ? visibleMarkers[0].options.name : null;
-        schoolSelection = schoolPass === 'Chicago Jesuit Academy' ? 1 : schoolPass === 'School 2' ? 2 : null;
+        var schoolPass = null;
+        if (visibleMarkers.length === 1) {
+          schoolPass = visibleMarkers[0].options.name;
+        }
+
+        if (schoolPass === 'Chicago Jesuit Academy') {
+          schoolSelection = 1;
+        } else if (schoolPass === 'School 2') {
+          schoolSelection = 2;
+        } else if (schoolPass === 'Quarra Stone') {
+          schoolSelection = 3;
+        }
+        else {
+          schoolSelection = null;
+        }
 
         if (schoolSelection !== null) {
           createTopCanvasButtons(schoolSelection);
@@ -271,11 +269,6 @@
       }
     }
 
-    function addRoomMarker(name, color, width, height, lat, lng, text, number) {
-      var roomMarker = new classSensor(name, color, width, height, lat, lng, text, number);
-      roomMarkers.push(roomMarker);
-    }
-
     function clearRoomMarkers() {
       roomMarkers.forEach(function (roomMarker) {
         map.removeLayer(roomMarker.marker);
@@ -308,7 +301,7 @@
 
     function setMaxZoom() {
       var viewportHeight = window.innerHeight;
-      currentMaxZoom = viewportHeight < 600 ? manuMax : 20.5; // Update global variable
+      currentMaxZoom = viewportHeight < 550 ? manuMax : 19.5; // Update global variable
       console.log("Maximum Zoom Level:", currentMaxZoom);
       return currentMaxZoom;
     }
@@ -319,15 +312,37 @@
         zoom: initialMapZoom,
         maxZoom: setMaxZoom(), // Initialize maxZoom
         zoomDelta: 2,
-        wheelPxPerZoomLevel: 50
+        wheelPxPerZoomLevel: 50,
+        scrollWheelZoom: false, // Disable scroll wheel zoom initially
+        dragging: false,        // Disable dragging initially
+        touchZoom: false,       // Disable touch zoom initially
+        doubleClickZoom: false  // Disable double-click zoom initially
       };
 
       map = L.map('map', options);
 
-      var googleLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: options.maxZoom, // Use the same maxZoom
+      // Define the road map layer
+      var roadMapLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 19.5,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: 'Map data &copy; Google'
+      }).addTo(map); // Add road map layer as default
+
+      // Define the satellite map layer
+      var satelliteMapLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 19.5,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: 'Map data &copy; Google'
+      });
+
+      // Layer control for switching between road map and satellite view
+      var baseMaps = {
+        "Road Map": roadMapLayer,
+        "Satellite View": satelliteMapLayer
+      };
+
+      var layerControl = L.control.layers(baseMaps, null, {
+        position: 'topleft' // Set the position to 'topleft'
       }).addTo(map);
 
       var pieData1 = [
@@ -340,7 +355,12 @@
         { color: '#FFFF00', percentage: 50 }
       ];
 
-      const marker1 = L.marker([41.877331, -87.751678], { icon: createPiechartIcon(pieData1, 70, "20"), name: "Chicago Jesuit Academy", zIndexOffset: 1000 }).addTo(map);
+      var pieData3 = [
+        { color: 'red', percentage: 40 },
+        { color: '#FFFF00', percentage: 50 }
+      ];
+
+      const marker1 = L.marker([41.877331, -87.751678], { icon: createPiechartIcon(pieData1, 40, "20"), name: "Chicago Jesuit Academy", zIndexOffset: 1000 }).addTo(map);
       marker1.bindPopup("<b>Chicago Jesuit Academy</b>");
       markerArray.push(marker1);
 
@@ -350,7 +370,7 @@
         onMarkerClick(lat, lng);
       });
 
-      const marker2 = L.marker([43.0731, -89.4012], { icon: createPiechartIcon(pieData2, 70, "4"), name: "School 2", zIndexOffset: 1000 }).addTo(map);
+      const marker2 = L.marker([43.0731, -89.4012], { icon: createPiechartIcon(pieData2, 40, "4"), name: "School 2", zIndexOffset: 1000 }).addTo(map);
       marker2.bindPopup("<b>School 2</b>");
       markerArray.push(marker2);
 
@@ -359,6 +379,16 @@
         var lat = e.latlng.lat;
         onMarkerClick(lat, lng);
       });
+
+      const marker3 = L.marker([43.2084038, -89.1974613], { icon: createPiechartIcon(pieData3, 40, "8"), name: "Quarra Stone", zIndexOffset: 1000 }).addTo(map);
+      marker3.bindPopup("<b>Quarra Stone</b>");
+      markerArray.push(marker3);
+
+      marker3.on('click', function (e) {
+        var lng = e.latlng.lng;
+        var lat = e.latlng.lat;
+        onMarkerClick(lat, lng);
+      });      
 
       markerArray.forEach(function (marker) {
         marker.on('mouseover', function () {
@@ -378,6 +408,27 @@
 
       map.on('zoomend', function () {
         updateVisibleMarkers();
+        if (map.getZoom() >= 19.5) {
+          layerControl._container.style.pointerEvents = 'none'; // Disable layer control
+          layerControl._container.style.opacity = '0.5'; // Dim layer control for visual feedback
+        } else {
+          layerControl._container.style.pointerEvents = 'auto'; // Enable layer control
+          layerControl._container.style.opacity = '1'; // Restore layer control opacity
+        }
+      });
+
+      map.on('load', function () {
+        map.scrollWheelZoom.enable();
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+      });
+
+      map.whenReady(function () {
+        map.scrollWheelZoom.enable();
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
       });
 
       updateVisibleMarkers();
@@ -385,6 +436,9 @@
       activateButton(document.getElementById('btn3').parentElement.querySelector('.button'), 'bottomCanvas');
 
       document.getElementById('returnButton').addEventListener('click', returnToInitialMapView);
+
+      // Call updateExplanation with the initial option
+      updateExplanation('option1');
     }
 
     // Update maxZoom on window resize
@@ -434,18 +488,7 @@
 
     function onMarkerClick(lat, lng) {
       console.log("Marker clicked at latitude:", lat, "and longitude:", lng);
-      console.log('*****' + map.getMaxZoom());
-      map.setView([lat, lng], map.getMaxZoom() - 0.5); // Adjust zoom to maxZoom
-    }
-
-    function showCanvas4(roomName) {
-      activeRoomName = roomName; // Set the active room name
-      document.getElementById('canvasContainer4').style.display = 'block';
-      document.getElementById('overlay').style.display = 'block';
-
-      // Trigger clicks on button41 and Hour
-      document.getElementById('button41').click();
-      document.getElementById('hour').click();
+      map.setView([lat, lng], map.getMaxZoom() - 2); // Adjust zoom to maxZoom
     }
 
     function hideCanvas4() {
@@ -456,35 +499,184 @@
     document.getElementById('closeButton').onclick = hideCanvas4;
 
     document.getElementById('getCSVButton').addEventListener('click', generateAndDownloadCSV);
- 
 
     function generateAndDownloadCSV() {
-            // Define your data
-            const data = array13;
-            // Convert data array to CSV string
-            const csvContent = data.map(e => e.join(",")).join("\n");
+      // Define your data
+      const data = array13;
+      // Convert data array to CSV string
+      const csvContent = data.map(e => e.join(",")).join("\n");
 
-            // Create a blob from the CSV string
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      // Create a blob from the CSV string
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 
-            // Create a link element
-            const link = document.createElement("a");
-            if (link.download !== undefined) {
-                // Create a URL for the blob and set it as the href attribute
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", "data.csv");
-                
-                // Append link to the body and trigger the download
-                document.body.appendChild(link);
-                link.click();
-                
-                // Clean up and remove the link
-                document.body.removeChild(link);
-            }
-        }
+      // Create a link element
+      const link = document.createElement("a");
+      if (link.download !== undefined) {
+          // Create a URL for the blob and set it as the href attribute
+          const url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", "data.csv");
+          
+          // Append link to the body and trigger the download
+          document.body.appendChild(link);
+          link.click();
+          
+          // Clean up and remove the link
+          document.body.removeChild(link);
+      }
+    }
+
+
+
+// Function to update the explanation based on the option variable
+function updateExplanation(option) {
+  var explanationText;
+  switch (option) {
+    case 'option1':
+      explanationText = `
+        <div class="legend">
+          <h4>Carbon Dioxide (ppm)</h4>
+          <div><span style="background-color: #00ff00;"></span> < 1000 Typical</div>
+          <div><span style="background-color: #ffff00;"></span> 1000 - 2000 Moderate</div>
+          <div><span style="background-color: #ff0000;"></span> > 2000 High</div>
+          <div><span style="background-color: #000000;"></span> Connection Lost</div>
+          <div><span style="background-color: #808080;"></span> Room with No Sensor</div>
+        </div>`;
+      break;
+    case 'option2':
+    explanationText = `
+        <div class="legend">
+          <h4>Particulate Matter 2.5 (ug/m<sup>3</sup>)</h4>
+          <div><span style="background-color: #00ff00;"></span> < 19 Typical</div>
+          <div><span style="background-color: #ffff00;"></span> 19 - 25 Moderate</div>
+          <div><span style="background-color: #ff0000;"></span> > 25 High</div>
+          <div><span style="background-color: #000000;"></span> Connection Lost</div>
+          <div><span style="background-color: #808080;"></span> Room with No Sensor</div>
+        </div>`;
+      break;
+    case 'option3':
+    explanationText = `
+        <div class="legend">
+          <h4>Dew Point (\u00B0F)</h4>
+          <div><span style="background-color: #00ff00;"></span> < 55 Typical</div>
+          <div><span style="background-color: #ffff00;"></span> 55-60 Moderate</div>
+          <div><span style="background-color: #ff0000;"></span> > 60 High</div>
+          <div><span style="background-color: #000000;"></span> Connection Lost</div>
+          <div><span style="background-color: #808080;"></span> Room with No Sensor</div>
+        </div>`;
+      break;
+    case 'option4':
+    explanationText = `
+        <div class="legend">
+          <h4>TVOC (ug/m<sup>3</sup>)</h4>
+          <div><span style="background-color: #00ff00;"></span> < 1 Typical</div>
+          <div><span style="background-color: #ffff00;"></span> 1 - 10 Moderate</div>
+          <div><span style="background-color: #ff0000;"></span> > 10 High</div>
+          <div><span style="background-color: #000000;"></span> Connection Lost</div>
+          <div><span style="background-color: #808080;"></span> Room with No Sensor</div>
+        </div>`;
+      break;
+    case 'option5':
+    explanationText = `
+        <div class="legend">
+          <h4>Temperature (\u00B0F>)</h4>
+          <div><span style="background-color: #00ff00;"></span> < 65-81 Typical</div>
+          <div><span style="background-color: #ffff00;"></span> 55-65 Moderate</div>
+          <div><span style="background-color: #ffff00;"></span> 81-90 Moderate</div>
+          <div><span style="background-color: #ff0000;"></span> > 90 High</div>
+          <div><span style="background-color: #ff0000;"></span> < 55 Low</div>
+          <div><span style="background-color: #000000;"></span> Connection Lost</div>
+          <div><span style="background-color: #808080;"></span> Room with No Sensor</div>
+        </div>`;
+      break;
+    case 'option6':
+    explanationText = `
+        <div class="legend">
+          <h4>Relative Humidity (%>)</h4>
+          <div><span style="background-color: #00ff00;"></span> < 30-60 Typical</div>
+          <div><span style="background-color: #ffff00;"></span> 20-30 Moderate</div>
+          <div><span style="background-color: #ffff00;"></span> 60-80 Moderate</div>
+          <div><span style="background-color: #ff0000;"></span> > 80 High</div>
+          <div><span style="background-color: #ff0000;"></span> < 20 Low</div>
+          <div><span style="background-color: #000000;"></span> Connection Lost</div>
+          <div><span style="background-color: #808080;"></span> Room with No Sensor</div>
+        </div>`;
+      break;
+    default:
+      explanationText = 'Default explanation.';
+  }
+  var explanationDiv = document.getElementById('explanation');
+  if (explanationDiv) {
+    explanationDiv.innerHTML = explanationText;
+    console.log("Explanation updated: ", explanationText);
+  } else {
+    console.error("Explanation div not found");
+  }
+}
+
+// Adding event listeners to buttons
+document.getElementById('btn1').addEventListener('click', function() {
+  updateExplanation('option1');
+});
+document.getElementById('btn2').addEventListener('click', function() {
+  updateExplanation('option2');
+});
+document.getElementById('btn3').addEventListener('click', function() {
+  updateExplanation('option3');
+});
+document.getElementById('btn4').addEventListener('click', function() {
+  updateExplanation('option4');
+});
+document.getElementById('btn5').addEventListener('click', function() {
+  updateExplanation('option5');
+});
+document.getElementById('btn6').addEventListener('click', function() {
+  updateExplanation('option6');
+});
+
+// Simulate a click on btn3 when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('btn3').click();
+});
+
+// Function to toggle the visibility of the explanation section
+function toggleExplanationVisibility() {
+  var explanationDiv = document.getElementById('explanation');
+  if (map.getZoom() >= 18) {
+    explanationDiv.style.display = 'block';
+  } else {
+    explanationDiv.style.display = 'none';
+  }
+}
+
+// Attach the toggle function to the zoomend event of the map
+map.on('zoomend', function() {
+  toggleExplanationVisibility();
+});
+
+// Call the toggle function initially to set the correct visibility state
+document.addEventListener('DOMContentLoaded', function() {
+  toggleExplanationVisibility();
+});
+
+
+    function logCurrentState() {
+      legendOption = activeChartParameter;
+      console.log('%%%%%' + legendOption)
+      console.log("schoolSelection:", schoolSelection);
+      console.log("!!!!activeChartParameter:", activeChartParameter);
+      console.log("!!!!activeChartDate:", activeChartDate);
+      console.log("activeChartDate:", activeChartDate);
+      console.log("options.topOption:", options.topOption);
+      console.log("activeRoomName:", activeRoomName);
+      console.log("currentMaxZoom:", currentMaxZoom); // Log the current maximum zoom level
+    }
+
+    setInterval(logCurrentState, 5000);
   </script>
   <script src="scriptfile.js"></script>
+  <script src="scriptGenerate.js"></script>
   <script src="curve.js"></script>
 </body>
 </html>
+
