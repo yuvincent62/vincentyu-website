@@ -26,8 +26,6 @@
       display: flex;
       justify-content: center;
       gap: 10px; /* Space between buttons */
-      width: 80%;
-      height: 30px;
     }
     /* Style for bottom left canvas */
     #bottomCanvas {
@@ -119,7 +117,7 @@
   background-color: white;
 }
 
-#topCanvas, #returnCanvas {
+#topCanvas {
   position: absolute;
   top: 10px;
   background-color: white;
@@ -127,6 +125,8 @@
   border-radius: 10px;
   z-index: 1000;
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -141,10 +141,10 @@ z-index: 1000;
 display: flex;
 }
 
-
+/*
 #topCanvas {
   right: 60px;
-}
+}*/
 
 #returnCanvas {
   right: 10px;
@@ -161,3 +161,27 @@ display: flex;
   padding-left: 5px;
   padding-right: 5px;
 }
+
+
+.custom-control {
+  background: white;
+  padding: 10px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  font-size: 14px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: none; /* Initially hidden */
+}
+.legend-box {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+}
+.green { background: green; }
+.yellow { background: yellow; }
+.red { background: red; }
+.black { background: black; }
+.grey { background: grey; }
