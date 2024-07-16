@@ -141,11 +141,6 @@ z-index: 1000;
 display: flex;
 }
 
-/*
-#topCanvas {
-  right: 60px;
-}*/
-
 #returnCanvas {
   right: 10px;
 }
