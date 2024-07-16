@@ -31,8 +31,8 @@
 
     .explanation {
       position: absolute;
-      bottom: 10px;
-      right: 10px;
+      bottom: 0px;
+      right: 0px;
       background-color: white;
       padding: 10px;
       border: 1px solid #ccc;
@@ -54,6 +54,7 @@
       margin: 0;
       font-weight: bold;
       font-size: 16px;
+      text-align: center;
     }
     .legend div {
       display: flex;
@@ -62,8 +63,8 @@
     }
     .legend span {
       display: inline-block;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       margin-right: 5px;
     }
 
@@ -79,8 +80,8 @@
         font-size: 8px;
       }
       .legend span {
-        width: 5px;
-        height: 5px;
+        width: 8px;
+        height: 8px;
       }
     }
   </style>
@@ -88,7 +89,8 @@
 
 <body>
   <div id="map"></div>
-  <div class="explanation" id="explanation">Explanation goes here</div> <!-- Explanation overlay -->
+
+  <div class="explanation" id="explanation" aria-live="polite">Explanation goes here</div>
 
   <div id="topCanvas"></div>
   <div id="returnCanvas">
@@ -247,6 +249,7 @@
         }
         showCanvas('topCanvas');
         showCanvas('bottomCanvas');
+        showCanvas('explanation');
         defineAndDisplayRoomMarkers(schoolSelection, options.topOption);
 
         var firstTopButton = document.querySelector('#topCanvas .buttonTop');
@@ -265,6 +268,7 @@
         }
         hideCanvas('topCanvas');
         hideCanvas('bottomCanvas');
+        hideCanvas('explanation');
         clearRoomMarkers();
       }
     }
@@ -441,19 +445,6 @@
       updateExplanation('option1');
     }
 
-    // Update maxZoom on window resize
-    window.addEventListener('resize', function () {
-      var newMaxZoom = setMaxZoom();
-      map.setMaxZoom(newMaxZoom); // Update the map's maxZoom dynamically
-
-      // Also update the tile layer's maxZoom
-      map.eachLayer(function (layer) {
-        if (layer instanceof L.TileLayer) {
-          layer.options.maxZoom = newMaxZoom;
-        }
-      });
-    });
-
     function hideCanvas(canvasId) {
       var canvas = document.getElementById(canvasId);
       if (canvas) {
@@ -548,8 +539,8 @@ function updateExplanation(option) {
         <div class="legend">
           <h4>Particulate Matter 2.5 (ug/m<sup>3</sup>)</h4>
           <div><span style="background-color: #00ff00;"></span> < 19 Typical</div>
-          <div><span style="background-color: #ffff00;"></span> 19 - 25 Moderate</div>
-          <div><span style="background-color: #ff0000;"></span> > 25 High</div>
+          <div><span style="background-color: #ffff00;"></span> 19 - 250 Moderate</div>
+          <div><span style="background-color: #ff0000;"></span> > 250 High</div>
           <div><span style="background-color: #000000;"></span> Connection Lost</div>
           <div><span style="background-color: #808080;"></span> Room with No Sensor</div>
         </div>`;
@@ -592,7 +583,7 @@ function updateExplanation(option) {
     case 'option6':
     explanationText = `
         <div class="legend">
-          <h4>Relative Humidity (%>)</h4>
+          <h4>Relative Humidity (%)</h4>
           <div><span style="background-color: #00ff00;"></span> < 30-60 Typical</div>
           <div><span style="background-color: #ffff00;"></span> 20-30 Moderate</div>
           <div><span style="background-color: #ffff00;"></span> 60-80 Moderate</div>
@@ -639,25 +630,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn3').click();
 });
 
-// Function to toggle the visibility of the explanation section
-function toggleExplanationVisibility() {
-  var explanationDiv = document.getElementById('explanation');
-  if (map.getZoom() >= 18) {
-    explanationDiv.style.display = 'block';
-  } else {
-    explanationDiv.style.display = 'none';
-  }
-}
 
-// Attach the toggle function to the zoomend event of the map
-map.on('zoomend', function() {
-  toggleExplanationVisibility();
-});
-
-// Call the toggle function initially to set the correct visibility state
-document.addEventListener('DOMContentLoaded', function() {
-  toggleExplanationVisibility();
-});
 
 
     function logCurrentState() {
@@ -672,7 +645,8 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("currentMaxZoom:", currentMaxZoom); // Log the current maximum zoom level
     }
 
-    setInterval(logCurrentState, 5000);
+//    setInterval(logCurrentState, 5000);
+
   </script>
   <script src="scriptfile.js"></script>
   <script src="scriptGenerate.js"></script>
