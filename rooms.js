@@ -147,24 +147,33 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
     return Math.pow(2, zoom - 20.5); 
   }
 
+  function addClassToAllButtons(className) {
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+      button.classList.add(className);
+    });
+  }
+  
   function addRoomMarker(name, color, width, height, lat, lng, text, number, borderRadius) {
     var roomMarker = new classSensor(name, color, width, height, lat, lng, text, number, borderRadius);
     roomMarkers.push(roomMarker);
+    // Call the function to add the class after adding the room marker
+    addClassToAllButtons('classRoom');
   }
-
-  const scaleFactor =setScallor();
+  
+  const scaleFactor = setScallor();
+  
   function addModifiedRoomMarker(room, color, width, height, lat, lng, code, value, borderRadius) {
-      // Adjust width and height based on the scale factor if necessary
-      const adjustedWidth = width * scaleFactor;
-      const adjustedHeight = height * scaleFactor;
-      let adjustedborderRadius;
-      if (borderRadius){
-        adjustedborderRadius = borderRadius * scaleFactor;
-      }
-      else{
-        adjustedborderRadius = 0;
-      }   
-      addRoomMarker(room, color, adjustedWidth, adjustedHeight, lat, lng, code, prefix + value + suffix, adjustedborderRadius);
+    // Adjust width and height based on the scale factor if necessary
+    const adjustedWidth = width * scaleFactor;
+    const adjustedHeight = height * scaleFactor;
+    let adjustedborderRadius;
+    if (borderRadius) {
+      adjustedborderRadius = borderRadius * scaleFactor;
+    } else {
+      adjustedborderRadius = 0;
+    }
+    addRoomMarker(room, color, adjustedWidth, adjustedHeight, lat, lng, code, prefix + value + suffix, adjustedborderRadius);
   }
 
   if (school === 1) {
@@ -209,11 +218,8 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
     addModifiedRoomMarker('Room 311', 'green', 120, 120, 43.20825, -89.197485, 'F', valueArray[5], 76);
     addModifiedRoomMarker('Room 311', 'green', 120, 120, 43.20809, -89.19746, 'G', valueArray[6], 76);
     addModifiedRoomMarker('Room 311', 'green', 100, 100, 43.20798, -89.197430, 'H', valueArray[7], 65);
-
   }
 }
-
-
 
 
 
