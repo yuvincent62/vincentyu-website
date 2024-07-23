@@ -1,5 +1,5 @@
-  class classSensor {
-    constructor(name, color, width, height, lat, lng, text, number, borderRadius = "0") {
+class classSensor {
+  constructor(name, color, width, height, lat, lng, text, number, borderRadius = "0") {
       this.name = name;
       this.color = color;
       this.width = width;
@@ -9,27 +9,36 @@
       this.text = text;
       this.number = this.createMarkerNumber(number);
       this.borderRadius = borderRadius; // New property for borderRadius
-      this.icon = this.createColoredIcon(); // Initialize icon using createColoredIcon method
+      this.icon = this.createColoredIcon(map.getZoom()); // Initialize icon using createColoredIcon method
       this.marker = L.marker([lat, lng], { icon: this.icon, zIndexOffset: 100 }).addTo(map);
       this.marker.bindPopup(`<b>${this.name}</b>`);
       this.showCanvas4 = this.showCanvas4.bind(this);
       this.marker.on('click', () => this.showCanvas4(name)); // Pass the room name
       this.marker.on('mouseover', () => this.showNumberPopup());
       this.marker.on('mouseout', () => this.hideNumberPopup());
-    }
-  
-    createColoredIcon() {
+      
+      // Bind the adjustFontSize method to zoomend and moveend events
+      map.on('zoomend moveend', () => this.updateIcon());
+  }
+
+  calculateFontSize(zoomLevel) {
+      const baseSize = 22; // Base font size
+      const scaleFactor = 1.6; // Scaling factor for each zoom level
+      return baseSize * Math.pow(scaleFactor, zoomLevel - 20.5);
+  }
+
+  createColoredIcon(zoomLevel) {
       const { color, width, height, text, borderRadius } = this;
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext('2d');
-  
+
       // Draw rounded rectangle with border
       ctx.fillStyle = color;
       ctx.strokeStyle = 'black';
       ctx.lineWidth = 3;
-  
+
       // Draw rounded rectangle
       const cornerRadius = parseFloat(borderRadius); // Convert borderRadius to a float number
       ctx.beginPath();
@@ -43,69 +52,74 @@
       ctx.lineTo(0, cornerRadius);
       ctx.quadraticCurveTo(0, 0, cornerRadius, 0);
       ctx.closePath();
-      
       ctx.fill();
       ctx.stroke();
-  
-      // Draw text in the center
-      ctx.font = '16px Arial';
+
+      // Draw text in the center with dynamic font size
+      const fontSize = this.calculateFontSize(zoomLevel);
+      ctx.font = `${fontSize}px Arial`;
       ctx.fillStyle = 'black';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(text, width / 2, height / 2);
-  
+
       // Return L.icon object with canvas image data
       return L.icon({
-        iconUrl: canvas.toDataURL(),
-        iconSize: [width, height],
-        iconAnchor: [width / 2, height / 2]
+          iconUrl: canvas.toDataURL(),
+          iconSize: [width, height],
+          iconAnchor: [width / 2, height / 2]
       });
-    }
-  
-    createMarkerNumber(number) {
+  }
+
+  createMarkerNumber(number) {
       const markerNumber = document.createElement('div');
       markerNumber.className = 'marker-number';
       markerNumber.innerText = number;
       return markerNumber;
-    }
-  
-    // Other methods remain unchanged
-    updateColor(newColor) {
-      this.color = newColor;
-      this.icon = this.createColoredIcon();
+  }
+
+  updateIcon() {
+      const zoomLevel = map.getZoom();
+      this.icon = this.createColoredIcon(zoomLevel);
       this.marker.setIcon(this.icon);
-    }
-  
-    showCanvas4(roomName) {
+  }
+
+  // Other methods remain unchanged
+  updateColor(newColor) {
+      this.color = newColor;
+      this.updateIcon();
+  }
+
+  showCanvas4(roomName) {
       activeRoomName = roomName; // Set the active room name
       document.getElementById('canvasContainer4').style.display = 'block';
       document.getElementById('overlay').style.display = 'block';
-  
+
       // Trigger clicks on button43 and Day
       document.getElementById('button43').click();
       document.getElementById('day').click();
-    }
-  
-    showNumberPopup() {
+  }
+
+  showNumberPopup() {
       if (this.marker.options.opacity === 1) {
-        this.marker.bindPopup(`<b>${this.number.innerText}</b>`).openPopup();
+          this.marker.bindPopup(`<b>${this.number.innerText}</b>`).openPopup();
       }
-    }
-  
-    hideNumberPopup() {
+  }
+
+  hideNumberPopup() {
       this.marker.closePopup();
-    }
-  
-    hideMarker() {
+  }
+
+  hideMarker() {
       this.marker.setOpacity(0);
       this.marker.unbindPopup();
-    }
-  
-    showMarker() {
+  }
+
+  showMarker() {
       this.marker.setOpacity(1);
       this.marker.bindPopup(`<b>${this.name}</b>`);
-    }
   }
+}  
   
 function defineAndDisplayRoomMarkers(school, floor, parameter) {
   clearRoomMarkers();
