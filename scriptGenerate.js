@@ -28,3 +28,26 @@ document.addEventListener('DOMContentLoaded', function () {
   drawCurve();
 });
 
+
+
+
+function setActiveParameter(button) {
+  document.querySelectorAll('.chart-parameter').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  button.classList.add('active');
+  activeChartParameter = button.id;
+  console.log('Active parameter set to:', activeChartParameter);
+  drawCurve();
+}
+
+function setActiveDate(button) {
+  document.querySelectorAll('.chart-date').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  button.classList.add('active');
+  activeChartDate = button.id;
+  console.log('Active date set to:', activeChartDate);
+  drawCurve();
+}
+
