@@ -1,26 +1,92 @@
-var zoomLevel = false;
-var schoolSelection = null;
-var map;
-var markerArray = [];
-var roomMarkers = [];
-var activeTopButtonId = 'top1';
-var activeBottomButtonText = 'Dew Point';
-var initialMapCenter = [43.0731, -89.4012];
-var initialMapZoom = 8;
-var activeChartParameter = 'CO2'; // Default active parameter
-var activeChartDate = 'hour'; // Default active date
-var activeRoomName = ''; // Default active room name
-var currentMaxZoom; // Global variable to hold current maximum zoom 
-var needTop = true;
-var options = {
+let zoomLevel = false;
+let schoolSelection = null;
+let map;
+let markerArray = [];
+let roomMarkers = [];
+let activeTopButtonId = 'top1';
+let activeBottomButtonText = 'Dew Point';
+const initialMapCenter = [43.0731, -89.4012];
+const initialMapZoom = 8;
+let activeChartParameter = 'CO2'; // Default active parameter
+let activeChartDate = 'hour'; // Default active date
+let activeRoomName = ''; // Default active room name var needTop = true;
+let options = {
   topOption: 'Ground',
   bottomOption: 'Dew Point'
 };
 
+    function updateVisibleMarkers() {
+      var visibleMarkers = markerArray.filter(function (marker) {
+        return map.getBounds().contains(marker.getLatLng());
+      });
+
+      console.log('Visible Markers:', visibleMarkers.map(marker => marker.options.name));
+
+      var zoomLevel = map.getZoom() >= 18;
+      const arrayLength = markerArray.length;
+
+      if (zoomLevel) {
+        var schoolPass = null;
+        if (visibleMarkers.length === 1) {
+          schoolPass = visibleMarkers[0].options.name;
+        }
+
+        if (schoolPass === 'Chicago Jesuit Academy') {
+          schoolSelection = 1;
+        } else if (schoolPass === 'School 2') {
+          schoolSelection = 2;
+        } else if (schoolPass === 'Quarra Stone') {
+          schoolSelection = 3;
+        }
+        else {
+          schoolSelection = null;
+        }
+
+        if (schoolSelection !== '3') {
+          createTopCanvasButtons(schoolSelection);
+        }
+
+        for (let i = 0; i < arrayLength; i++) {
+          markerArray[i].setOpacity(0);
+          markerArray[i].closePopup();
+          markerArray[i].unbindPopup();
+        }
+        showCanvas('topCanvas');
+        showCanvas('bottomCanvas');
+        showCanvas('explanation');
+
+        var firstTopButton = document.querySelector('#topCanvas .buttonTop');    //move back to initial setting
+        if (firstTopButton) {
+          firstTopButton.click();
+        }
+
+        var thirdBottomButton = document.querySelectorAll('#bottomCanvas .buttonBottom')[2];
+        if (thirdBottomButton) {
+          thirdBottomButton.click();
+        }
+      } else {    //not zoomlevel
+        for (let i = 0; i < arrayLength; i++) {
+          markerArray[i].setOpacity(1);
+          markerArray[i].bindPopup(`<b>${markerArray[i].options.name}</b>`);
+        }
+        hideCanvas('topCanvas');
+        hideCanvas('bottomCanvas');
+        hideCanvas('explanation');
+        clearRoomMarkers();
+      }
+    }
+
+    function clearRoomMarkers() {
+      roomMarkers.forEach(function (roomMarker) {
+        map.removeLayer(roomMarker.marker);
+      });
+      roomMarkers = [];
+    }
+
     function activateButton(button, canvasId) {
       var canvasType = canvasId === 'topCanvas' ? 'topOption' : 'bottomOption';
 
-      var buttons = document.querySelectorAll('#' + canvasId + ' .button, #' + canvasId + ' .buttonTop, #' + canvasId + ' .buttonBottom');
+      var buttons = document.querySelectorAll('#' + canvasId + ' .buttonTop, #' + canvasId + ' .buttonBottom');
       buttons.forEach(function (btn) {
         btn.classList.remove('active');
         btn.style.backgroundColor = "white";
@@ -45,7 +111,7 @@ var options = {
       const currentFloor = options.topOption;
       const currentParameter = activeBottomButtonText;
       let colorArray = [];
-      zoomLevel = (map.getZoom()>15);    
+      zoomLevel = (map.getZoom()>=18);    
       if (zoomLevel) {
         colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
       }
@@ -54,6 +120,26 @@ var options = {
 
 
 
+    function onOptionChange(prop, value) {
+      console.log(`The ${prop} was changed to ${value}`);
+      if (prop === 'topOption') {
+        defineAndDisplayRoomMarkers(schoolSelection, value, activeBottomButtonText);
+      } else if (prop === 'bottomOption') {
+        defineAndDisplayRoomMarkers(schoolSelection, options.topOption, activeBottomButtonText);
+      }
+    }
+
+    function updateMarkerColors(colorArray) {
+      var visibleMarkers = roomMarkers.filter(function (room) {
+        return room.marker.options.opacity === 1;
+      });
+
+      visibleMarkers.forEach(function (room, index) {
+        if (index < colorArray.length) {
+          room.updateColor(colorArray[index]);
+        }
+      });
+    }
 
     function createTopCanvasButtons(school) {
       var topCanvas = document.getElementById('topCanvas');
@@ -169,7 +255,7 @@ function generateSensorArrays(numSensor) {
           array.push(getRandomNumber(400, 2500));
           break;
         case 1: // PM2.5
-          array.push(getRandomNumber(10, 30));
+          array.push(getRandomNumber(10, 300));
           break;
         case 2: // Dew point
           array.push(getRandomNumber(30, 70));
@@ -291,7 +377,7 @@ console.log('*****************' + SetValueArray(1, 'Ground', 'CO2'));
 
 const thresholds = {
   dim1: { red: [2000, -10], yellow: [1000, -5] },
-  dim2: { red: [25, -10], yellow: [18, -5] },
+  dim2: { red: [250, -10], yellow: [18, -5] },
   dim3: { red: [60, -10], yellow: [55, -5] },
   dim4: { red: [10, -10], yellow: [1, -5] },
   dim5: { red: [90, 55], yellow: [81, 65] },
@@ -348,4 +434,5 @@ function getColumn(array, i) {
     // Return the column array
     return column;
 }
+
 
