@@ -1,7 +1,15 @@
+.bottomButtonText, #topCanvas .buttonText {
+  font-family: Arial, sans-serif; /* Adjust the font family */
+  font-size: 12px; /* Adjust the font size */
+  font-weight: 550; /* Adjust the font weight */
+  color: black; /* Adjust the text color */
+}
+
+
 .top-buttons, .chart-buttons {
   display: flex;
   justify-content: space-around;
-  padding: 10px 0;
+  padding: 10px;
   flex-wrap: wrap;
   width: 100%;
 }
@@ -94,6 +102,29 @@
     align-items: center;
   }
 
+
+
+  
+  #topCanvas .buttonTop,
+  #bottomCanvas .buttonBottom {
+    width: 25px;
+    /* Adjust width */
+    height: 25px;
+    /* Adjust height */
+    margin-top: 0px;
+    margin-bottom: 5px;
+    /* Reduce margin */
+
+    /* Adjust font size */
+    padding: 0;
+    /* Remove padding */
+    border-radius: 50%;
+    /* Ensure buttons are circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   /* CSS for scaling down buttons and adjusting layout */
   @media (max-height: 550px) {
     button.chart-parameter,
@@ -148,7 +179,8 @@
       /* Adjust width */
       height: 15px;
       /* Adjust height */
-      margin-top: -10px;
+      margin-top: 0px;
+      margin-bottom: 5px;
       /* Reduce margin */
       font-size: 10px;
       /* Adjust font size */
@@ -229,5 +261,11 @@
       padding-left: 2px;
       padding-right: 2px;
       font-size: 10px;
+    }
+    .bottomButtonText, #topCanvas .buttonText {
+      font-family: Arial, sans-serif; /* Adjust the font family */
+      font-size: 8px; /* Adjust the font size */
+      font-weight: 550; /* Adjust the font weight */
+      color: black; /* Adjust the text color */
     }
   }
