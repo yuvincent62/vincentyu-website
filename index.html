@@ -39,6 +39,7 @@
       z-index: 1000; /* Ensure the explanation is above the map */
       display: inline-block;
       max-width: 300px;
+      touch-action: none;
     }
 
     .legend {
@@ -629,6 +630,18 @@ document.getElementById('btn6').addEventListener('click', function() {
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn3').click();
 });
+
+    
+
+    // Adding event listeners to prevent zooming in the explanation area
+    const explanation = document.getElementById('explanation');
+    explanation.addEventListener('wheel', function (event) {
+      event.preventDefault();
+    });
+    explanation.addEventListener('touchmove', function (event) {
+      event.preventDefault();
+    });    
+    
 
     function logCurrentState() {
       legendOption = activeChartParameter;
