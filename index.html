@@ -657,7 +657,14 @@ document.addEventListener('DOMContentLoaded', function() {
     topCanvas.addEventListener('touchmove', function (event) {
       event.preventDefault();
     });   
-   
+
+    const returnCanvas = document.getElementById('returnCanvas');
+    returnCanvas.addEventListener('wheel', function (event) {
+      event.preventDefault();
+    });
+    returnCanvas.addEventListener('touchmove', function (event) {
+      event.preventDefault();
+    });   
   </script>
   <script src="scriptfile.js"></script>
   <script src="scriptGenerate.js"></script>
