@@ -648,23 +648,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     bottomCanvas.addEventListener('touchmove', function (event) {
       event.preventDefault();
-    });    
-    
+    });   
 
-    function logCurrentState() {
-      legendOption = activeChartParameter;
-      console.log('%%%%%' + legendOption)
-      console.log("schoolSelection:", schoolSelection);
-      console.log("!!!!activeChartParameter:", activeChartParameter);
-      console.log("!!!!activeChartDate:", activeChartDate);
-      console.log("activeChartDate:", activeChartDate);
-      console.log("options.topOption:", options.topOption);
-      console.log("activeRoomName:", activeRoomName);
-      console.log("currentMaxZoom:", currentMaxZoom); // Log the current maximum zoom level
-    }
-
-//    setInterval(logCurrentState, 5000);
-
+    const topCanvas = document.getElementById('topCanvas');
+    topCanvas.addEventListener('wheel', function (event) {
+      event.preventDefault();
+    });
+    topCanvas.addEventListener('touchmove', function (event) {
+      event.preventDefault();
+    });   
+   
   </script>
   <script src="scriptfile.js"></script>
   <script src="scriptGenerate.js"></script>
