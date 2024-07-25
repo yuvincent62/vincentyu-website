@@ -640,6 +640,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     explanation.addEventListener('touchmove', function (event) {
       event.preventDefault();
+    });  
+
+    const bottomCanvas = document.getElementById('bottomCanvas');
+    bottomCanvas.addEventListener('wheel', function (event) {
+      event.preventDefault();
+    });
+    bottomCanvas.addEventListener('touchmove', function (event) {
+      event.preventDefault();
     });    
     
 
