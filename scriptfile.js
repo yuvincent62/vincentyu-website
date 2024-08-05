@@ -1,0 +1,421 @@
+let zoomLevel = false;
+let schoolSelection = null;
+let map;
+let markerArray = [];
+let roomMarkers = [];
+let activeTopButtonId = 'top1';
+let activeBottomButtonText = 'Dew Point';
+const initialMapCenter = [43.0731, -89.4012];
+const initialMapZoom = 8;
+let activeChartParameter = 'CO2';
+let activeChartDate = 'hour';
+let activeRoomName = '';
+let options = {
+  topOption: 'Ground',
+  bottomOption: 'Dew Point'
+};
+
+function updateVisibleMarkers() {
+  var visibleMarkers = markerArray.filter(function (marker) {
+    return map.getBounds().contains(marker.getLatLng());
+  });
+
+  console.log('Visible Markers:', visibleMarkers.map(marker => marker.options.name));
+
+  var zoomLevel = map.getZoom() >= 18;
+  const arrayLength = markerArray.length;
+
+  if (zoomLevel) {
+    var schoolPass = null;
+    if (visibleMarkers.length === 1) {
+      schoolPass = visibleMarkers[0].options.name;
+    }
+
+    if (schoolPass === 'Chicago Jesuit Academy') {
+      schoolSelection = 1;
+    } else if (schoolPass === 'School 2') {
+      schoolSelection = 2;
+    } else if (schoolPass === 'Quarra Stone') {
+      schoolSelection = 3;
+    }
+    else {
+      schoolSelection = null;
+    }
+
+    if (schoolSelection !== null) {
+      createTopCanvasButtons(schoolSelection);
+    }
+
+    for (let i = 0; i < arrayLength; i++) {
+      markerArray[i].setOpacity(0);
+      markerArray[i].closePopup();
+      markerArray[i].unbindPopup();
+    }
+    showCanvas('topCanvas');
+    showCanvas('bottomCanvas');
+    showCanvas('explanation');
+    defineAndDisplayRoomMarkers(schoolSelection, options.topOption);
+
+    var firstTopButton = document.querySelector('#topCanvas .buttonTop');
+    if (firstTopButton) {
+      firstTopButton.click();
+    }
+
+    var thirdBottomButton = document.querySelectorAll('#bottomCanvas .buttonBottom')[2];
+    if (thirdBottomButton) {
+      thirdBottomButton.click();
+    }
+  } else {
+    for (let i = 0; i < arrayLength; i++) {
+      markerArray[i].setOpacity(1);
+      markerArray[i].bindPopup(`<b>${markerArray[i].options.name}</b>`);
+    }
+    hideCanvas('topCanvas');
+    hideCanvas('bottomCanvas');
+    hideCanvas('explanation');
+    clearRoomMarkers();
+  }
+}
+
+function clearRoomMarkers() {
+  roomMarkers.forEach(function (roomMarker) {
+    map.removeLayer(roomMarker.marker);
+  });
+  roomMarkers = [];
+}
+
+function activateButton(button, canvasId) {
+  var canvasType = canvasId === 'topCanvas' ? 'topOption' : 'bottomOption';
+
+  var buttons = document.querySelectorAll('#' + canvasId + ' .buttonTop, #' + canvasId + ' .buttonBottom');
+  buttons.forEach(function (btn) {
+    btn.classList.remove('active');
+    btn.style.backgroundColor = "white";
+    btn.style.color = "black";
+  });
+
+  button.classList.add('active');
+  button.style.backgroundColor = "green";
+  button.style.color = "white";
+
+  options[canvasType] = button.nextElementSibling.textContent.trim();
+
+  if (canvasId === 'topCanvas') {
+    activeTopButtonId = button.id;
+  } else if (canvasId === 'bottomCanvas') {
+    activeBottomButtonText = button.nextElementSibling.textContent.trim();
+  }
+
+  onOptionChange(canvasType, options[canvasType]);
+
+  const currentSchool = schoolSelection;
+  const currentFloor = options.topOption;
+  const currentParameter = activeBottomButtonText;
+  let colorArray = [];
+  zoomLevel = (map.getZoom()>=18);    
+  if (zoomLevel) {
+    colorArray = SetColorArray(currentSchool, currentFloor, currentParameter);
+  }
+  updateMarkerColors(colorArray);
+}
+
+function createTopCanvasButtons(school) {
+  var topCanvas = document.getElementById('topCanvas');
+  topCanvas.innerHTML = '';
+
+  var buttonNames;
+  if (school === 1) {
+    buttonNames = ['Ground', 'First', 'Second'];
+  } else if(school === 2){
+    buttonNames = ['Floor1', 'Floor2'];
+  } else if(school === 3){
+      buttonNames = ['null'];
+  }
+  if ( buttonNames!='null'){
+    buttonNames.forEach(function (name, index) {
+      var buttonContainer = document.createElement('div');
+      buttonContainer.className = 'buttonContainer';
+      var button = document.createElement('button');
+      button.id = 'top' + (index + 1);
+      button.className = 'buttonTop';
+      button.onclick = function () { activateButton(this, 'topCanvas'); };
+      var span = document.createElement('span');
+      span.className = 'buttonText';
+      span.textContent = name;
+      buttonContainer.appendChild(button);
+      buttonContainer.appendChild(span);
+      topCanvas.appendChild(buttonContainer);
+    });
+    var firstButton = topCanvas.querySelector('.buttonTop');
+    if (firstButton) {
+      activateButton(firstButton, 'topCanvas');
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var initialMapCenter = [43.0731, -89.4012];
+  var initialMapZoom = 8;
+
+  function returnToInitialMapView() {
+    console.log("Return button clicked");
+    map.setView(initialMapCenter, initialMapZoom);
+  }
+
+  document.getElementById('returnButton').addEventListener('click', returnToInitialMapView);
+});
+
+function createPiechartIcon(data, size, text) {
+function percentageToAngle(percentage) {
+return (percentage / 100) * 360;
+}
+
+function describeArc(x, y, radius, startAngle, endAngle) {
+var start = polarToCartesian(x, y, radius, endAngle);
+var end = polarToCartesian(x, y, radius, startAngle);
+var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+var d = [
+  "M", x, y,
+  "L", start.x, start.y,
+  "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+  "Z"
+].join(" ");
+return d;
+}
+
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+return {
+  x: centerX + (radius * Math.cos(angleInRadians)),
+  y: centerY + (radius * Math.sin(angleInRadians))
+};
+}
+
+var startAngle = 0;
+var paths = data.map(function(segment) {
+var percentage = segment.percentage;
+if (percentage === 100) {
+  percentage = 99.999; // Slightly reduce the percentage to avoid full circle rendering issue
+}
+var endAngle = startAngle + percentageToAngle(percentage);
+var path = describeArc(16, 16, 16, startAngle, endAngle);
+startAngle = endAngle;
+return `<path d="${path}" fill="${segment.color}"/>`;
+}).join("");
+
+var svg = `
+<svg width="${size}" height="${size}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  ${paths}
+  <circle cx="16" cy="16" r="10" fill="white"/>
+  <text x="16" y="21" font-size="10" text-anchor="middle" fill="#000">${text}</text>
+</svg>`;
+var url = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+return new L.Icon({
+iconUrl: url,
+iconSize: [size, size],
+iconAnchor: [size / 2, size / 2],
+popupAnchor: [0, -size / 2]
+});
+}
+
+
+function setMaxZoom() {
+  var viewportHeight = window.innerHeight;
+  currentMaxZoom = viewportHeight < 550 ? manuMax : 19.5;
+  console.log("Maximum Zoom Level:", currentMaxZoom);
+  return currentMaxZoom;
+}
+
+let manuMax = 19.5;
+
+//generate data
+function getRandomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function generateSensorArrays(numSensor) {
+  let sensorArrays = [];
+  
+  for (let sensor = 1; sensor <= numSensor; sensor++) {
+    let array = [];
+    for (let i = 0; 6 > i; i++) {
+      switch (i) {
+        case 0:
+          array.push(getRandomNumber(400, 2500));
+          break;
+        case 1:
+          array.push(getRandomNumber(10, 300));
+          break;
+        case 2:
+          array.push(getRandomNumber(30, 70));
+          break;
+        case 3:
+          array.push(getRandomNumber(0, 12));
+          break;
+        case 4:
+          array.push(getRandomNumber(40, 100));
+          break;
+        case 5:
+          array.push(getRandomNumber(10, 100));
+          break;
+      }   
+    }
+    sensorArrays.push(array);
+  }
+  return sensorArrays;
+}
+
+const array11 = generateSensorArrays(4);
+const array12 = generateSensorArrays(9);
+const array13 = generateSensorArrays(7);
+const array21 = generateSensorArrays(2);
+const array22 = generateSensorArrays(2);
+const array31 = generateSensorArrays(10);
+
+function SetColorArray(school, floor, airQuality){
+  let colorAy=[];
+  let currentFloorData;
+  if(school===1){
+    if(floor==='Ground'){
+      currentFloorData=array11;
+    }else if (floor==='First'){
+      currentFloorData=array12
+    }else if(floor==='Second'){
+      currentFloorData=array13;
+    }
+  }else if(school===2){
+    if(floor==='Floor1'){
+      currentFloorData=array21;
+    }else if(floor==='Floor2'){
+      currentFloorData=array22;
+    }
+  } else if(school===3){
+    currentFloorData=quarraArray;
+  }
+  if (airQuality=='CO2'){
+    currentParameterData = getColumn(currentFloorData, 0);
+  } 
+  else if (airQuality=='PM2.5'){
+    currentParameterData = getColumn(currentFloorData, 1);
+  }
+  else if (airQuality=='Dew Point'){
+    currentParameterData = getColumn(currentFloorData, 2);
+  }
+  else if(airQuality=='TVOC'){
+    currentParameterData = getColumn(currentFloorData, 3);
+  }
+  else if (airQuality=='Temperature'){
+    currentParameterData = getColumn(currentFloorData, 4);
+  }
+  else if (airQuality=='Relative Humidity'){
+    currentParameterData = getColumn(currentFloorData, 5);
+  }
+  const sensorAmount = currentFloorData.length;
+  const dim = checkDim(airQuality);
+
+  roomColor=[];
+  for(let i=0;i<sensorAmount;i++){
+    workingData = evaluateNumber(currentParameterData[i], dim);
+    roomColor.push(workingData);
+  }
+  return roomColor;
+}
+
+function SetValueArray(school, floor, airQuality){
+  let currentFloorData;
+  if(school===1){
+    if(floor==='Ground'){
+      currentFloorData=array11;
+    }else if (floor==='First'){
+      currentFloorData=array12;
+    }else if(floor==='Second'){
+      currentFloorData=array13;
+    }
+  }else if(school===2){
+    if(floor==='Floor1'){
+      currentFloorData=array21;
+    }else if(floor==='Floor2'){
+      currentFloorData=array22;
+    }
+  } else if(school===3){
+    currentFloorData=quarraArray;
+  }
+  if (airQuality=='CO2'){
+    currentParameterData = getColumn(currentFloorData, 0);
+  } 
+  else if (airQuality=='PM2.5'){
+    currentParameterData = getColumn(currentFloorData, 1);
+  }
+  else if (airQuality=='Dew Point'){
+    currentParameterData = getColumn(currentFloorData, 2);
+  }
+  else if(airQuality=='TVOC'){
+    currentParameterData = getColumn(currentFloorData, 3);
+  }
+  else if (airQuality=='Temperature'){
+    currentParameterData = getColumn(currentFloorData, 4);
+  }
+  else if (airQuality=='Relative Humidity'){
+    currentParameterData = getColumn(currentFloorData, 5);
+  }
+  return currentParameterData;
+}
+
+console.log('*****************' + SetValueArray(1, 'Ground', 'CO2'));
+
+const thresholds = {
+  dim1: { red: [2000, -10], yellow: [1000, -5] },
+  dim2: { red: [250, -10], yellow: [18, -5] },
+  dim3: { red: [60, -10], yellow: [55, -5] },
+  dim4: { red: [10, -10], yellow: [1, -5] },
+  dim5: { red: [90, 55], yellow: [81, 65] },
+  dim6: { red: [80, 20], yellow: [60, 30] }
+};
+
+function evaluateNumber(number, dim) {
+  const threshold = thresholds['dim' + dim];
+  const redMax = threshold.red[0];
+  const redMin = threshold.red[1];
+  const yellowMax = threshold.yellow[0];
+  const yellowMin = threshold.yellow[1];
+
+  if (number > redMax || number < redMin) {
+      return 'red';
+  } else if ((number < redMax && number > yellowMax) || (number < yellowMin && number > redMin)) {
+      return 'yellow';
+  } else {
+      return 'green';
+  }
+}
+
+function checkDim(input){
+  if (input=='CO2'){
+    return 1;
+  }
+  else if (input=='PM2.5'){
+    return 2;
+  }
+  else if (input=='Dew Point'){
+    return 3;
+  }
+  else if (input=='TVOC'){
+    return 4;
+  }
+  else if (input=='Temperature'){
+    return 5;
+  }
+  else {
+    return 6;
+  }
+}
+
+function getColumn(array, i) {
+    var column = [];
+    for (var j = 0; j < array.length; j++) {
+        column.push(array[j][i]);
+    }
+    return column;
+}
+
+
