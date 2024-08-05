@@ -127,13 +127,7 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
   const bottomOption = activeBottomButtonText;
   const valueArrayIn = SetValueArray(school, floor, bottomOption);
   let valueArray = valueArrayIn.map(num => parseFloat(num.toFixed(1)));
-
-  console.log('11111 parameter' + parameter);
-  console.log('11111 school' + school);
-  console.log('11111 floor' + floor);
-  console.log('11111 bottomOption' + bottomOption);
-  console.log('1111 valuearray' +valueArray);
-
+  
   let suffix = '';
   let prefix = '';
   if (parameter === 'CO2') {
