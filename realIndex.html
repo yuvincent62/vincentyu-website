@@ -121,11 +121,11 @@
     let cArray1 = [];
     let cArray2 = [];
     let cArray3 = [];
-    const apiKey = api_Key;
     
     async function requestAccessToken() {
       const clientId = client_Id;
       const clientSecret = client_Secret;
+      const apiKey = api_Key;
 
       const credentials = `${clientId}:${clientSecret}`;
       const encodedCredentials = btoa(credentials);
@@ -153,7 +153,7 @@
     }
 
     const myHeaders = new Headers();
-    myHeaders.append("x-api-key", apiKey);
+    myHeaders.append("x-api-key", "i9Pax1ZLPH5uRilqKOmWY3TB2TbhSqQH86c78VaS");
 
     async function fetchData() {
       try {      
