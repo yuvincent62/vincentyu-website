@@ -123,8 +123,9 @@
     let cArray3 = [];
     
     async function requestAccessToken() {
-      const clientId = "broan-ciaq-conclusiveinsights.client.bdbs80lebnaapu5avm4capd0zcphsyn2";
-      const clientSecret = "gn136a3mx5mly0ves9cvsfw38ooucl7k96ueo85z79xs4pikaqqmv2l6w8ccwfpk";
+      const clientId = client_Id;
+      const clientSecret = client_Secret;
+      const apiKey = process.env.api_Key;
 
       const credentials = `${clientId}:${clientSecret}`;
       const encodedCredentials = btoa(credentials);
@@ -152,7 +153,7 @@
     }
 
     const myHeaders = new Headers();
-    myHeaders.append("x-api-key", "i9Pax1ZLPH5uRilqKOmWY3TB2TbhSqQH86c78VaS");
+    myHeaders.append("x-api-key", apiKey);
 
     async function fetchData() {
       try {      
