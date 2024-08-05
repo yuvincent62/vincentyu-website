@@ -121,11 +121,11 @@
     let cArray1 = [];
     let cArray2 = [];
     let cArray3 = [];
+    const apiKey = process.env.api_Key;
     
     async function requestAccessToken() {
-      const clientId = client_Id;
-      const clientSecret = client_Secret;
-      const apiKey = process.env.api_Key;
+      const clientId = process.env.client_Id;
+      const clientSecret = process.env.client_Secret;
 
       const credentials = `${clientId}:${clientSecret}`;
       const encodedCredentials = btoa(credentials);
