@@ -260,3 +260,7 @@ display: flex;
     #explanation {
       display: none;
     }
+/*Diaable touch action*/
+#topCanvas, #bottomCanvas, #returnButton, #explanation {
+  touch-action: none;
+}
