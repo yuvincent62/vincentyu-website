@@ -609,13 +609,13 @@ function defineAndDisplayRoomMarkers(school, floor, parameter) {
         maxZoom: 19.5,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: 'Map data &copy; Google'
-      }).addTo(map);
+      });
 
       var satelliteMapLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
         maxZoom: 19.5,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: 'Map data &copy; Google'
-      });
+      }).addTo(map);
 
       var baseMaps = {
         "Road Map": roadMapLayer,
